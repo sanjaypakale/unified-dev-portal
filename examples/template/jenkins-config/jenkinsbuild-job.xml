@@ -1,29 +1,17 @@
-<org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject plugin="workflow-multibranch@770.v1a_d0708dd1f6">
-<actions/>
-<description/>
-<displayName>buildpipeline</displayName>
-<properties/>
-<folderViews class="jenkins.branch.MultiBranchProjectViewHolder" plugin="branch-api@2.1128.v717130d4f816">
-<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-</folderViews>
-<healthMetrics/>
-<icon class="jenkins.branch.MetadataActionFolderIcon" plugin="branch-api@2.1128.v717130d4f816">
-<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-</icon>
-<orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.858.v898218f3609d">
-<pruneDeadBranches>true</pruneDeadBranches>
-<daysToKeep>-1</daysToKeep>
-<numToKeep>-1</numToKeep>
-<abortBuilds>false</abortBuilds>
-</orphanedItemStrategy>
+<flow-definition plugin="workflow-job@1326.ve643e00e9220">
+<actions>
+<org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@2.2150.v4cfd8916915c"/>
+<org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@2.2150.v4cfd8916915c">
+<jobProperties/>
 <triggers/>
-<disabled>false</disabled>
-<sources class="jenkins.branch.MultiBranchProject$BranchSourceList" plugin="branch-api@2.1128.v717130d4f816">
-<data>
-<jenkins.branch.BranchSource>
-<source class="jenkins.scm.impl.SingleSCMSource" plugin="scm-api@676.v886669a_199a_a_">
-<id>b7c1ba19-1309-4cc9-aa3b-15e4dd48f56d</id>
-<name>test</name>
+<parameters/>
+<options/>
+</org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+</actions>
+<description/>
+<keepDependencies>false</keepDependencies>
+<properties/>
+<definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@3837.v305192405b_c0">
 <scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
 <configVersion>2</configVersion>
 <userRemoteConfigs>
@@ -41,16 +29,9 @@
 <submoduleCfg class="empty-list"/>
 <extensions/>
 </scm>
-</source>
-<strategy class="jenkins.branch.DefaultBranchPropertyStrategy">
-<properties class="empty-list"/>
-</strategy>
-</jenkins.branch.BranchSource>
-</data>
-<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
-</sources>
-<factory class="org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory">
-<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
 <scriptPath>Jenkinsfile</scriptPath>
-</factory>
-</org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject>
+<lightweight>true</lightweight>
+</definition>
+<triggers/>
+<disabled>false</disabled>
+</flow-definition>

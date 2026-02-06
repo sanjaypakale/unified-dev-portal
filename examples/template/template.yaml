@@ -63,7 +63,7 @@ spec:
       name: Publish
       action: publish:github
       input:
-        description: This is ${{ parameters.name }}
+        description: This is ${{ parameters.name }} ${{ parameters.repoUrl }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: 'main'
 
@@ -81,7 +81,7 @@ spec:
       action: jenkins:job:create
       input:
         configPath: ./jenkins-config/jenkinsbuild-job.xml
-        jobName: ${{ parameters.name }}
+        jobName: ${{ "ci_" + parameters.name }}
         folderName: ''
 
     # The final step is to register our new component in the catalog.
