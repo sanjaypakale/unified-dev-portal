@@ -37,6 +37,7 @@ integrations:
     - host: github.com
       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
       # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
+      # The actual value should be provided via the GITHUB_TOKEN environment variable and MUST NOT be committed to source control.
       token: ${GITHUB_TOKEN}
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
@@ -111,3 +112,8 @@ kubernetes:
 permission:
   # setting this to `false` will disable permissions
   enabled: true
+
+jenkins:
+  baseUrl: ${JENKINS_SERVER_URL}
+  username: ${JENKINS_USERNAME}
+  apiKey: ${JENKINS_API_KEY}

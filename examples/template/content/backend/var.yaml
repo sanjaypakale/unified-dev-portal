@@ -1,0 +1,2 @@
+replicas: ${{ values.replicaCount }}
+memory: ${{ values.memory }}

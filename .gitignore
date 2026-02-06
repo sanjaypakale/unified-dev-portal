@@ -10,6 +10,8 @@ yarn-error.log*
 
 # Coverage directory generated when running tests with coverage
 coverage
+token.txt
+start-local.bat
 
 # Dependencies
 node_modules/

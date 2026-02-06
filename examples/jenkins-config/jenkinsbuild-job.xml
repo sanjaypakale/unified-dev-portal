@@ -1,0 +1,56 @@
+<org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject plugin="workflow-multibranch@770.v1a_d0708dd1f6">
+<actions/>
+<description/>
+<displayName>buildpipeline</displayName>
+<properties/>
+<folderViews class="jenkins.branch.MultiBranchProjectViewHolder" plugin="branch-api@2.1128.v717130d4f816">
+<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
+</folderViews>
+<healthMetrics/>
+<icon class="jenkins.branch.MetadataActionFolderIcon" plugin="branch-api@2.1128.v717130d4f816">
+<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
+</icon>
+<orphanedItemStrategy class="com.cloudbees.hudson.plugins.folder.computed.DefaultOrphanedItemStrategy" plugin="cloudbees-folder@6.858.v898218f3609d">
+<pruneDeadBranches>true</pruneDeadBranches>
+<daysToKeep>-1</daysToKeep>
+<numToKeep>-1</numToKeep>
+<abortBuilds>false</abortBuilds>
+</orphanedItemStrategy>
+<triggers/>
+<disabled>false</disabled>
+<sources class="jenkins.branch.MultiBranchProject$BranchSourceList" plugin="branch-api@2.1128.v717130d4f816">
+<data>
+<jenkins.branch.BranchSource>
+<source class="jenkins.scm.impl.SingleSCMSource" plugin="scm-api@676.v886669a_199a_a_">
+<id>b7c1ba19-1309-4cc9-aa3b-15e4dd48f56d</id>
+<name>test</name>
+<scm class="hudson.plugins.git.GitSCM" plugin="git@5.2.1">
+<configVersion>2</configVersion>
+<userRemoteConfigs>
+<hudson.plugins.git.UserRemoteConfig>
+<url>${{ values.repoUrl }}</url>
+<credentialsId>github</credentialsId>
+</hudson.plugins.git.UserRemoteConfig>
+</userRemoteConfigs>
+<branches>
+<hudson.plugins.git.BranchSpec>
+<name>*/main</name>
+</hudson.plugins.git.BranchSpec>
+</branches>
+<doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+<submoduleCfg class="empty-list"/>
+<extensions/>
+</scm>
+</source>
+<strategy class="jenkins.branch.DefaultBranchPropertyStrategy">
+<properties class="empty-list"/>
+</strategy>
+</jenkins.branch.BranchSource>
+</data>
+<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
+</sources>
+<factory class="org.jenkinsci.plugins.workflow.multibranch.WorkflowBranchProjectFactory">
+<owner class="org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject" reference="../.."/>
+<scriptPath>Jenkinsfile</scriptPath>
+</factory>
+</org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject>
