@@ -1,4 +1,5 @@
-import { Navigate, Route } from 'react-router-dom';
+import { PropsWithChildren } from 'react';
+import { Navigate, Route, useLocation } from 'react-router-dom';
 import { apiDocsPlugin, ApiExplorerPage } from '@backstage/plugin-api-docs';
 import {
   CatalogEntityPage,
@@ -25,11 +26,7 @@ import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
 import { Root } from './components/Root';
 
-import {
-  AlertDisplay,
-  OAuthRequestDialog,
-  SignInPage,
-} from '@backstage/core-components';
+import { AlertDisplay, OAuthRequestDialog } from '@backstage/core-components';
 import { createApp } from '@backstage/app-defaults';
 import { AppRouter, FlatRoutes } from '@backstage/core-app-api';
 import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
@@ -37,6 +34,11 @@ import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 import { NotificationsPage } from '@backstage/plugin-notifications';
 import { SignalsDisplay } from '@backstage/plugin-signals';
+import { CustomSignInPage } from './components/SignIn/CustomSignInPage';
+import {
+  VALUE_STREAM_DASHBOARD_PATH,
+  ValueStreamDashboard,
+} from './components/value-stream';
 
 const app = createApp({
   apis,
@@ -58,12 +60,24 @@ const app = createApp({
     });
   },
   components: {
-    SignInPage: props => <SignInPage {...props} auto providers={['guest']} />,
+    SignInPage: CustomSignInPage,
   },
 });
 
+const AppLayout = ({ children }: PropsWithChildren<{}>) => {
+  const { pathname } = useLocation();
+  if (pathname === VALUE_STREAM_DASHBOARD_PATH) {
+    return <>{children}</>;
+  }
+  return <Root>{children}</Root>;
+};
+
 const routes = (
   <FlatRoutes>
+    <Route
+      path={VALUE_STREAM_DASHBOARD_PATH}
+      element={<ValueStreamDashboard />}
+    />
     <Route path="/" element={<Navigate to="catalog" />} />
     <Route path="/catalog" element={<CatalogIndexPage />} />
     <Route
@@ -106,7 +120,7 @@ export default app.createRoot(
     <OAuthRequestDialog />
     <SignalsDisplay />
     <AppRouter>
-      <Root>{routes}</Root>
+      <AppLayout>{routes}</AppLayout>
     </AppRouter>
   </>,
 );
