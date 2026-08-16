@@ -72,5 +72,16 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "jest": {
+    "moduleNameMapper": {
+      "^@exodus/bytes/encoding-lite\\.js$": "<rootDir>/test-shims/encodingLite.cjs",
+      "^@exodus/bytes/encoding-lite$": "<rootDir>/test-shims/encodingLite.cjs"
+    },
+    "coveragePathIgnorePatterns": [
+      "/test-shims/",
+      "\\.test\\.(ts|tsx)$",
+      "\\.fixture\\.ts$"
+    ]
+  }
 }

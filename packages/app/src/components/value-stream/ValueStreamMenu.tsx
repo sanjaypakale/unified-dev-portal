@@ -225,7 +225,7 @@ const TopLevelItem = ({
         MenuListProps={{ disablePadding: true }}
         PaperProps={{ className: classes.menuPaper, elevation: 0 }}
       >
-        {item.children!.map((child, index) => (
+        {item.children?.map((child, index) => (
           <NestedMenuItem
             key={`${child.displayName}-${index}`}
             item={child}
@@ -311,7 +311,7 @@ const NestedMenuItem = ({
         }}
       >
         <MenuList disablePadding>
-          {item.children!.map((child, index) => (
+          {item.children?.map((child, index) => (
             <NestedMenuItem
               key={`${child.displayName}-${index}`}
               item={child}

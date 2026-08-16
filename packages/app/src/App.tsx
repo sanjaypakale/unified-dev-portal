@@ -1,5 +1,4 @@
-import { PropsWithChildren } from 'react';
-import { Navigate, Route, useLocation } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { apiDocsPlugin, ApiExplorerPage } from '@backstage/plugin-api-docs';
 import {
   CatalogEntityPage,
@@ -24,7 +23,6 @@ import { UserSettingsPage } from '@backstage/plugin-user-settings';
 import { apis } from './apis';
 import { entityPage } from './components/catalog/EntityPage';
 import { searchPage } from './components/search/SearchPage';
-import { Root } from './components/Root';
 
 import { AlertDisplay, OAuthRequestDialog } from '@backstage/core-components';
 import { createApp } from '@backstage/app-defaults';
@@ -35,6 +33,7 @@ import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/
 import { NotificationsPage } from '@backstage/plugin-notifications';
 import { SignalsDisplay } from '@backstage/plugin-signals';
 import { CustomSignInPage } from './components/SignIn/CustomSignInPage';
+import { AppLayout } from './AppLayout';
 import {
   VALUE_STREAM_DASHBOARD_PATH,
   ValueStreamDashboard,
@@ -63,14 +62,6 @@ const app = createApp({
     SignInPage: CustomSignInPage,
   },
 });
-
-const AppLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { pathname } = useLocation();
-  if (pathname === VALUE_STREAM_DASHBOARD_PATH) {
-    return <>{children}</>;
-  }
-  return <Root>{children}</Root>;
-};
 
 const routes = (
   <FlatRoutes>
