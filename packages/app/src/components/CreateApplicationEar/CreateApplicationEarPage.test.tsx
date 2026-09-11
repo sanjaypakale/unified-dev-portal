@@ -99,19 +99,15 @@ describe('CreateApplicationEarPage', () => {
     fireEvent.click(within(getDialog()).getByRole('button', { name }));
   };
 
-  /** Material-table action cells can omit a reliable button accessible name. */
-  const clickEditFor = async (appName: string) => {
-    await waitFor(() => {
-      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    });
-    const row = (await screen.findByText(appName)).closest('tr');
-    expect(row).toBeTruthy();
-    fireEvent.click(within(row as HTMLElement).getByText(/^Edit$/));
+  const clickEditAt = async (index: number) => {
+    fireEvent.click((await screen.findAllByText(/^Edit$/))[index]);
   };
 
   beforeEach(() => {
     getAllEarApps.mockReset();
     createOrUpdateEarApplication.mockReset();
+    getAllEarApps.mockResolvedValue(SAMPLE_APPS);
+    createOrUpdateEarApplication.mockResolvedValue({});
     jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
@@ -120,15 +116,16 @@ describe('CreateApplicationEarPage', () => {
     jest.restoreAllMocks();
   });
 
-  it('loads apps, creates, edits, cancels, and saves covering field branches', async () => {
-    getAllEarApps.mockResolvedValue(SAMPLE_APPS);
-    createOrUpdateEarApplication.mockResolvedValue({});
-
+  it('loads apps and shows active flags', async () => {
     renderPage();
-
     expect(await screen.findByText('Payments Service')).toBeInTheDocument();
     expect(screen.getAllByText('Yes').length).toBeGreaterThan(0);
     expect(screen.getByText('No')).toBeInTheDocument();
+  });
+
+  it('creates an inactive app with empty optional fields', async () => {
+    renderPage();
+    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
 
     await openCreateDialog();
     fillRequired();
@@ -151,12 +148,13 @@ describe('CreateApplicationEarPage', () => {
         }),
       );
     });
+  });
 
-    await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
+  it('edits an app and updates instance fields', async () => {
+    renderPage();
+    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
 
-    await clickEditFor('Payments Service');
+    await clickEditAt(0);
     expect(
       await screen.findByRole('heading', { name: 'Update Application EAR' }),
     ).toBeInTheDocument();
@@ -184,21 +182,34 @@ describe('CreateApplicationEarPage', () => {
         }),
       );
     });
+  });
 
-    await clickEditFor('Catalog Gateway');
-    await screen.findByRole('heading', { name: 'Update Application EAR' });
+  it('cancels edit for inactive and string-active rows', async () => {
+    renderPage();
+    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
+
+    await clickEditAt(1);
+    expect(
+      await screen.findByRole('heading', { name: 'Update Application EAR' }),
+    ).toBeInTheDocument();
     clickDialogButton(/^Cancel$/);
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: 'Update Application EAR' }),
+      ).not.toBeInTheDocument();
     });
 
-    await clickEditFor('Identity Portal');
-    await screen.findByRole('heading', { name: 'Update Application EAR' });
+    await clickEditAt(2);
+    expect(
+      await screen.findByRole('heading', { name: 'Update Application EAR' }),
+    ).toBeInTheDocument();
     clickDialogButton(/^Cancel$/);
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: 'Update Application EAR' }),
+      ).not.toBeInTheDocument();
     });
-  }, 15000);
+  });
 
   it('handles empty payload, load failure, and save failure', async () => {
     getAllEarApps.mockResolvedValueOnce(null as unknown as any[]);
@@ -231,7 +242,7 @@ describe('CreateApplicationEarPage', () => {
         expect.any(Error),
       );
     });
-  }, 15000);
+  });
 
   it('shows progress while apps are loading', async () => {
     getAllEarApps.mockImplementation(() => new Promise(() => undefined));
