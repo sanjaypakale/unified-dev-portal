@@ -1,5 +1,6 @@
 import { TestApiProvider, wrapInTestApp } from '@backstage/test-utils';
 import {
+  cleanup,
   fireEvent,
   render,
   screen,
@@ -113,6 +114,7 @@ describe('CreateApplicationEarPage', () => {
   });
 
   afterEach(() => {
+    cleanup();
     jest.restoreAllMocks();
   });
 
@@ -184,7 +186,7 @@ describe('CreateApplicationEarPage', () => {
     });
   });
 
-  it('cancels edit for inactive and string-active rows', async () => {
+  it('cancels edit for an inactive row', async () => {
     renderPage();
     expect(await screen.findByText('Payments Service')).toBeInTheDocument();
 
@@ -198,6 +200,11 @@ describe('CreateApplicationEarPage', () => {
         screen.queryByRole('heading', { name: 'Update Application EAR' }),
       ).not.toBeInTheDocument();
     });
+  });
+
+  it('opens edit for a string-active row then cancels', async () => {
+    renderPage();
+    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
 
     await clickEditAt(2);
     expect(
@@ -211,27 +218,31 @@ describe('CreateApplicationEarPage', () => {
     });
   });
 
-  it('handles empty payload, load failure, and save failure', async () => {
+  it('handles a null apps payload', async () => {
     getAllEarApps.mockResolvedValueOnce(null as unknown as any[]);
-    const first = renderPage();
+    renderPage();
     await waitFor(() => expect(getAllEarApps).toHaveBeenCalledTimes(1));
     expect(screen.getByText('Existing EAR Applications')).toBeInTheDocument();
-    first.unmount();
+    expect(screen.queryByText('Payments Service')).not.toBeInTheDocument();
+  });
 
+  it('handles load failure', async () => {
     getAllEarApps.mockRejectedValueOnce(new Error('load failed'));
-    const second = renderPage();
+    renderPage();
     await waitFor(() => {
       expect(console.warn).toHaveBeenCalledWith(
         'Error loading existing EAR apps:',
         expect.any(Error),
       );
     });
-    second.unmount();
+    expect(screen.getByText('Existing EAR Applications')).toBeInTheDocument();
+  });
 
-    getAllEarApps.mockResolvedValue(SAMPLE_APPS);
-    createOrUpdateEarApplication.mockRejectedValue(new Error('save failed'));
+  it('handles save failure', async () => {
+    createOrUpdateEarApplication.mockRejectedValueOnce(new Error('save failed'));
     renderPage();
     expect(await screen.findByText('Payments Service')).toBeInTheDocument();
+
     await openCreateDialog();
     fillRequired();
     clickDialogButton(/^Create$/);
