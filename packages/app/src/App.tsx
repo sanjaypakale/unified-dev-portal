@@ -38,6 +38,7 @@ import {
   VALUE_STREAM_DASHBOARD_PATH,
   ValueStreamDashboard,
 } from './components/value-stream';
+import { CreateApplicationEarPage } from './components/CreateApplicationEar';
 
 const app = createApp({
   apis,
@@ -102,6 +103,10 @@ const routes = (
     <Route path="/settings" element={<UserSettingsPage />} />
     <Route path="/catalog-graph" element={<CatalogGraphPage />} />
     <Route path="/notifications" element={<NotificationsPage />} />
+    <Route
+      path="/admin/create-application-ear"
+      element={<CreateApplicationEarPage />}
+    />
   </FlatRoutes>
 );
 
