@@ -259,7 +259,7 @@ export const CreateApplicationEarPage = () => {
       handleClose();
     } catch (error) {
       console.error('Error saving EAR application', error);
-      alert('Failed to save EAR application');
+      
     } finally {
       setSaving(false);
     }

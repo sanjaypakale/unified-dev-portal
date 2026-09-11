@@ -104,7 +104,6 @@ describe('CreateApplicationEarPage', () => {
     createOrUpdateEarApplication.mockReset();
     jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    jest.spyOn(window, 'alert').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -220,9 +219,6 @@ describe('CreateApplicationEarPage', () => {
       expect(console.error).toHaveBeenCalledWith(
         'Error saving EAR application',
         expect.any(Error),
-      );
-      expect(window.alert).toHaveBeenCalledWith(
-        'Failed to save EAR application',
       );
     });
   }, 15000);
