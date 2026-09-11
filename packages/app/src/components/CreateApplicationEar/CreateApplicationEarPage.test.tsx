@@ -99,6 +99,16 @@ describe('CreateApplicationEarPage', () => {
     fireEvent.click(within(getDialog()).getByRole('button', { name }));
   };
 
+  /** Material-table action cells can omit a reliable button accessible name. */
+  const clickEditFor = async (appName: string) => {
+    await waitFor(() => {
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+    const row = (await screen.findByText(appName)).closest('tr');
+    expect(row).toBeTruthy();
+    fireEvent.click(within(row as HTMLElement).getByText(/^Edit$/));
+  };
+
   beforeEach(() => {
     getAllEarApps.mockReset();
     createOrUpdateEarApplication.mockReset();
@@ -146,7 +156,7 @@ describe('CreateApplicationEarPage', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Edit' }))[0]);
+    await clickEditFor('Payments Service');
     expect(
       await screen.findByRole('heading', { name: 'Update Application EAR' }),
     ).toBeInTheDocument();
@@ -175,14 +185,14 @@ describe('CreateApplicationEarPage', () => {
       );
     });
 
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Edit' }))[1]);
+    await clickEditFor('Catalog Gateway');
     await screen.findByRole('heading', { name: 'Update Application EAR' });
     clickDialogButton(/^Cancel$/);
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Edit' }))[2]);
+    await clickEditFor('Identity Portal');
     await screen.findByRole('heading', { name: 'Update Application EAR' });
     clickDialogButton(/^Cancel$/);
     await waitFor(() => {
