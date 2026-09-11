@@ -258,7 +258,7 @@ export const CreateApplicationEarPage = () => {
       await loadExistingApps();
       handleClose();
     } catch (error) {
-      console.error('Error saving EAR application', error);
+      console.error('Error saving EAR application');
       
     } finally {
       setSaving(false);

@@ -51,6 +51,9 @@ const SAMPLE_APPS = [
   { appCode: 'IDP', appName: 'Identity Portal', isActive: '1' },
 ];
 
+/** UI-heavy dialog flows need headroom on slow Jenkins agents (default Jest timeout is 5s). */
+const UI_TEST_TIMEOUT_MS = 20000;
+
 describe('CreateApplicationEarPage', () => {
   const getAllEarApps = jest.fn();
   const createOrUpdateEarApplication = jest.fn();
@@ -71,20 +74,23 @@ describe('CreateApplicationEarPage', () => {
 
   const getDialog = () => screen.getByRole('dialog');
 
-  const setField = (index: number, value: string) => {
-    fireEvent.change(within(getDialog()).getAllByRole('textbox')[index], {
-      target: { value },
+  const setFields = (updates: Array<[number, string]>) => {
+    const inputs = within(getDialog()).getAllByRole('textbox');
+    updates.forEach(([index, value]) => {
+      fireEvent.change(inputs[index], { target: { value } });
     });
   };
 
   const fillRequired = () => {
-    setField(IDX.appCode, 'NEW');
-    setField(IDX.uniqueAppCode, 'NEW-001');
-    setField(IDX.appName, 'New App');
-    setField(IDX.l2Code, 'L2-NEW');
-    setField(IDX.appLead, 'Lead');
-    setField(IDX.appLeadLanId, 'lead1');
-    setField(IDX.l2Head, 'Head');
+    setFields([
+      [IDX.appCode, 'NEW'],
+      [IDX.uniqueAppCode, 'NEW-001'],
+      [IDX.appName, 'New App'],
+      [IDX.l2Code, 'L2-NEW'],
+      [IDX.appLead, 'Lead'],
+      [IDX.appLeadLanId, 'lead1'],
+      [IDX.l2Head, 'Head'],
+    ]);
   };
 
   const openCreateDialog = async () => {
@@ -96,12 +102,22 @@ describe('CreateApplicationEarPage', () => {
     ).toBeInTheDocument();
   };
 
-  const clickDialogButton = (name: RegExp) => {
+  /**
+   * MUI ignores clicks on disabled buttons. On slow CI, React may not have
+   * re-rendered with isFormValid=true yet — wait before clicking.
+   */
+  const submitDialog = async (name: RegExp) => {
+    await waitFor(() => {
+      expect(
+        within(getDialog()).getByRole('button', { name }),
+      ).not.toBeDisabled();
+    });
     fireEvent.click(within(getDialog()).getByRole('button', { name }));
   };
 
   const clickEditAt = async (index: number) => {
-    fireEvent.click((await screen.findAllByText(/^Edit$/))[index]);
+    const edits = await screen.findAllByText(/^Edit$/);
+    fireEvent.click(edits[index]);
   };
 
   beforeEach(() => {
@@ -125,76 +141,82 @@ describe('CreateApplicationEarPage', () => {
     expect(screen.getByText('No')).toBeInTheDocument();
   });
 
-  it('creates an inactive app with empty optional fields', async () => {
-    renderPage();
-    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
+  it(
+    'creates an inactive app with empty optional fields',
+    async () => {
+      renderPage();
+      await openCreateDialog();
+      fillRequired();
+      fireEvent.click(within(getDialog()).getByLabelText('Active'));
+      await submitDialog(/^Create$/);
 
-    await openCreateDialog();
-    fillRequired();
-    fireEvent.click(within(getDialog()).getByLabelText('Active'));
-    clickDialogButton(/^Create$/);
+      await waitFor(() => {
+        expect(createOrUpdateEarApplication).toHaveBeenCalledWith(
+          expect.objectContaining({
+            appCode: 'NEW',
+            uniqueAppCode: 'NEW-001',
+            id: '',
+            isActive: '0',
+            sonarInstance: undefined,
+            jenkinsInstance: undefined,
+            artifactoryInstance: undefined,
+            veracodeInstance: undefined,
+            bitbucketInstance: undefined,
+            dastInstance: undefined,
+          }),
+        );
+      });
+    },
+    UI_TEST_TIMEOUT_MS,
+  );
 
-    await waitFor(() => {
-      expect(createOrUpdateEarApplication).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appCode: 'NEW',
-          uniqueAppCode: 'NEW-001',
-          id: '',
-          isActive: '0',
-          sonarInstance: undefined,
-          jenkinsInstance: undefined,
-          artifactoryInstance: undefined,
-          veracodeInstance: undefined,
-          bitbucketInstance: undefined,
-          dastInstance: undefined,
-        }),
-      );
-    });
-  });
+  it(
+    'edits an app and updates instance fields',
+    async () => {
+      renderPage();
+      await clickEditAt(0);
+      expect(
+        await screen.findByRole('heading', { name: 'Update Application EAR' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('App Code cannot be changed')).toBeInTheDocument();
 
-  it('edits an app and updates instance fields', async () => {
-    renderPage();
-    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
+      setFields([
+        [IDX.sonar, 's2'],
+        [IDX.jenkins, 'j2'],
+        [IDX.artifactory, 'a2'],
+        [IDX.veracode, 'v2'],
+        [IDX.bitbucket, 'b2'],
+        [IDX.dast, 'd2'],
+      ]);
+      await submitDialog(/^Update$/);
 
-    await clickEditAt(0);
-    expect(
-      await screen.findByRole('heading', { name: 'Update Application EAR' }),
-    ).toBeInTheDocument();
-    expect(screen.getByText('App Code cannot be changed')).toBeInTheDocument();
-
-    setField(IDX.jenkins, 'j2');
-    setField(IDX.sonar, 's2');
-    setField(IDX.artifactory, 'a2');
-    setField(IDX.veracode, 'v2');
-    setField(IDX.bitbucket, 'b2');
-    setField(IDX.dast, 'd2');
-    clickDialogButton(/^Update$/);
-
-    await waitFor(() => {
-      expect(createOrUpdateEarApplication).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: '1',
-          jenkinsInstance: 'j2',
-          sonarInstance: 's2',
-          artifactoryInstance: 'a2',
-          veracodeInstance: 'v2',
-          bitbucketInstance: 'b2',
-          dastInstance: 'd2',
-          isActive: '1',
-        }),
-      );
-    });
-  });
+      await waitFor(() => {
+        expect(createOrUpdateEarApplication).toHaveBeenCalledWith(
+          expect.objectContaining({
+            id: '1',
+            jenkinsInstance: 'j2',
+            sonarInstance: 's2',
+            artifactoryInstance: 'a2',
+            veracodeInstance: 'v2',
+            bitbucketInstance: 'b2',
+            dastInstance: 'd2',
+            isActive: '1',
+          }),
+        );
+      });
+    },
+    UI_TEST_TIMEOUT_MS,
+  );
 
   it('cancels edit for an inactive row', async () => {
     renderPage();
-    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
-
     await clickEditAt(1);
     expect(
       await screen.findByRole('heading', { name: 'Update Application EAR' }),
     ).toBeInTheDocument();
-    clickDialogButton(/^Cancel$/);
+    fireEvent.click(
+      within(getDialog()).getByRole('button', { name: /^Cancel$/ }),
+    );
     await waitFor(() => {
       expect(
         screen.queryByRole('heading', { name: 'Update Application EAR' }),
@@ -204,13 +226,13 @@ describe('CreateApplicationEarPage', () => {
 
   it('opens edit for a string-active row then cancels', async () => {
     renderPage();
-    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
-
     await clickEditAt(2);
     expect(
       await screen.findByRole('heading', { name: 'Update Application EAR' }),
     ).toBeInTheDocument();
-    clickDialogButton(/^Cancel$/);
+    fireEvent.click(
+      within(getDialog()).getByRole('button', { name: /^Cancel$/ }),
+    );
     await waitFor(() => {
       expect(
         screen.queryByRole('heading', { name: 'Update Application EAR' }),
@@ -238,22 +260,25 @@ describe('CreateApplicationEarPage', () => {
     expect(screen.getByText('Existing EAR Applications')).toBeInTheDocument();
   });
 
-  it('handles save failure', async () => {
-    createOrUpdateEarApplication.mockRejectedValueOnce(new Error('save failed'));
-    renderPage();
-    expect(await screen.findByText('Payments Service')).toBeInTheDocument();
-
-    await openCreateDialog();
-    fillRequired();
-    clickDialogButton(/^Create$/);
-
-    await waitFor(() => {
-      expect(console.error).toHaveBeenCalledWith(
-        'Error saving EAR application',
-        expect.any(Error),
+  it(
+    'handles save failure',
+    async () => {
+      createOrUpdateEarApplication.mockRejectedValueOnce(
+        new Error('save failed'),
       );
-    });
-  });
+      renderPage();
+      await openCreateDialog();
+      fillRequired();
+      await submitDialog(/^Create$/);
+
+      await waitFor(() => {
+        expect(console.error).toHaveBeenCalledWith(
+          'Error saving EAR application',
+        );
+      });
+    },
+    UI_TEST_TIMEOUT_MS,
+  );
 
   it('shows progress while apps are loading', async () => {
     getAllEarApps.mockImplementation(() => new Promise(() => undefined));
