@@ -39,6 +39,7 @@ import {
   ValueStreamDashboard,
 } from './components/value-stream';
 import { CreateApplicationEarPage } from './components/CreateApplicationEar';
+import { BitbucketBranchingStrategyPage } from './components/BitbucketBranchingStrategy';
 
 const app = createApp({
   apis,
@@ -106,6 +107,10 @@ const routes = (
     <Route
       path="/admin/create-application-ear"
       element={<CreateApplicationEarPage />}
+    />
+    <Route
+      path="/admin/bitbucket-branching-strategy"
+      element={<BitbucketBranchingStrategyPage />}
     />
   </FlatRoutes>
 );

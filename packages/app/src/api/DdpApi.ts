@@ -12,6 +12,22 @@ export type BitbucketRepoPermissionResponse = {
 
 export type EarApplicationPayload = Record<string, unknown>;
 
+export type BitbucketBranchingMetadata = {
+  id?: number | string;
+  branchingEnabled?: boolean;
+  domainName?: string;
+  uniqueAppCode?: string;
+  bitbucketProjectKey?: string;
+  repositoryName?: string;
+  as400?: boolean;
+  branchNamingRegex?: string;
+  enforcementDate?: string;
+  minimumGate?: number | string;
+  currentBranchingScore?: number | string;
+  currentBranchingGate?: number | string;
+  branchingStrategySopLink?: string;
+};
+
 const DUMMY_EAR_APPS: EarApplicationPayload[] = [
   {
     id: '1',
@@ -75,6 +91,54 @@ const DUMMY_EAR_APPS: EarApplicationPayload[] = [
   },
 ];
 
+const DUMMY_BITBUCKET_BRANCHING: BitbucketBranchingMetadata[] = [
+  {
+    id: 1,
+    branchingEnabled: true,
+    domainName: 'Payments',
+    uniqueAppCode: 'PAY-001',
+    bitbucketProjectKey: 'PAY',
+    repositoryName: 'payments-service',
+    as400: false,
+    branchNamingRegex: '^(feature|bugfix|hotfix)/.+$',
+    enforcementDate: '2026-01-15',
+    minimumGate: 80,
+    currentBranchingScore: 92,
+    currentBranchingGate: 80,
+    branchingStrategySopLink: 'https://wiki.example.com/branching/pay',
+  },
+  {
+    id: 2,
+    branchingEnabled: true,
+    domainName: 'Identity',
+    uniqueAppCode: 'IDP-002',
+    bitbucketProjectKey: 'IDP',
+    repositoryName: 'identity-portal',
+    as400: false,
+    branchNamingRegex: '^(feature|release)/.+$',
+    enforcementDate: '2026-02-01',
+    minimumGate: 70,
+    currentBranchingScore: 75,
+    currentBranchingGate: 70,
+    branchingStrategySopLink: 'https://wiki.example.com/branching/idp',
+  },
+  {
+    id: 3,
+    branchingEnabled: false,
+    domainName: 'Platform',
+    uniqueAppCode: 'CAT-003',
+    bitbucketProjectKey: 'CAT',
+    repositoryName: 'catalog-gateway',
+    as400: true,
+    branchNamingRegex: '^release/.+$',
+    enforcementDate: '2026-03-01',
+    minimumGate: 60,
+    currentBranchingScore: 58,
+    currentBranchingGate: 60,
+    branchingStrategySopLink: '',
+  },
+];
+
 export interface DdpApi {
   getBitbucketRepoPermission(
     projectKey: string,
@@ -85,6 +149,10 @@ export interface DdpApi {
   createOrUpdateEarApplication(
     payload: EarApplicationPayload,
   ): Promise<unknown>;
+  getAllBitbucketBranchingMetadata(): Promise<BitbucketBranchingMetadata[]>;
+  createOrUpdateBitbucketBranchingMetadata(
+    payload: BitbucketBranchingMetadata,
+  ): Promise<unknown>;
 }
 
 export const ddpApiRef = createApiRef<DdpApi>({
@@ -93,6 +161,9 @@ export const ddpApiRef = createApiRef<DdpApi>({
 
 export class DdpApiClient implements DdpApi {
   private earApps: EarApplicationPayload[] = [...DUMMY_EAR_APPS];
+  private branchingMetadata: BitbucketBranchingMetadata[] = [
+    ...DUMMY_BITBUCKET_BRANCHING,
+  ];
 
   constructor(
     private readonly discoveryApi: DiscoveryApi,
@@ -147,6 +218,50 @@ export class DdpApiClient implements DdpApi {
       id: String(this.earApps.length + 1),
     };
     this.earApps.push(created);
+    return created;
+  }
+
+  async getAllBitbucketBranchingMetadata(): Promise<
+    BitbucketBranchingMetadata[]
+  > {
+    // Dummy data for local UI. Replace with proxy API call when backend is ready.
+    return this.branchingMetadata.map(record => ({ ...record }));
+  }
+
+  async createOrUpdateBitbucketBranchingMetadata(
+    payload: BitbucketBranchingMetadata,
+  ): Promise<unknown> {
+    // Dummy in-memory create/update. Replace with proxy API call when backend is ready.
+    const payloadId =
+      payload.id !== undefined && payload.id !== null && payload.id !== ''
+        ? String(payload.id)
+        : '';
+    const existingIndex = this.branchingMetadata.findIndex(record => {
+      if (payloadId) {
+        return String(record.id) === payloadId;
+      }
+      return (
+        String(record.uniqueAppCode) === String(payload.uniqueAppCode) &&
+        String(record.bitbucketProjectKey) ===
+          String(payload.bitbucketProjectKey) &&
+        String(record.repositoryName) === String(payload.repositoryName)
+      );
+    });
+
+    if (existingIndex >= 0) {
+      this.branchingMetadata[existingIndex] = {
+        ...this.branchingMetadata[existingIndex],
+        ...payload,
+        id: this.branchingMetadata[existingIndex].id,
+      };
+      return this.branchingMetadata[existingIndex];
+    }
+
+    const created: BitbucketBranchingMetadata = {
+      ...payload,
+      id: this.branchingMetadata.length + 1,
+    };
+    this.branchingMetadata.push(created);
     return created;
   }
 }

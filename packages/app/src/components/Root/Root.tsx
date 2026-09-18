@@ -5,6 +5,7 @@ import ExtensionIcon from '@material-ui/icons/Extension';
 import LibraryBooks from '@material-ui/icons/LibraryBooks';
 import CreateComponentIcon from '@material-ui/icons/AddCircleOutline';
 import AppsIcon from '@material-ui/icons/Apps';
+import CallSplitIcon from '@material-ui/icons/CallSplit';
 import LogoFull from './LogoFull';
 import LogoIcon from './LogoIcon';
 import {
@@ -81,6 +82,11 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
           icon={AppsIcon}
           to="admin/create-application-ear"
           text="EAR Applications"
+        />
+        <SidebarItem
+          icon={CallSplitIcon}
+          to="admin/bitbucket-branching-strategy"
+          text="Bitbucket Branching"
         />
         {/* End global nav */}
         <SidebarDivider />
