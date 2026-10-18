@@ -40,6 +40,11 @@ import {
 } from './components/value-stream';
 import { CreateApplicationEarPage } from './components/CreateApplicationEar';
 import { BitbucketBranchingStrategyPage } from './components/BitbucketBranchingStrategy';
+import { PIPELINES_PATH, PipelinesPage } from './components/Pipelines';
+import {
+  CreatePipelineWizard,
+  OnboardApplicationPage,
+} from './components/Pipelines/create';
 
 const app = createApp({
   apis,
@@ -112,6 +117,13 @@ const routes = (
       path="/admin/bitbucket-branching-strategy"
       element={<BitbucketBranchingStrategyPage />}
     />
+    <Route
+      path="/pipelines/create/:workloadId/:platformId/:typeId/onboard"
+      element={<OnboardApplicationPage />}
+    />
+    <Route path="/pipelines/create/*" element={<CreatePipelineWizard />} />
+    <Route path="/pipelines/create" element={<CreatePipelineWizard />} />
+    <Route path={PIPELINES_PATH} element={<PipelinesPage />} />
   </FlatRoutes>
 );
 

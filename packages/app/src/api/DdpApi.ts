@@ -12,6 +12,16 @@ export type BitbucketRepoPermissionResponse = {
 
 export type EarApplicationPayload = Record<string, unknown>;
 
+export type PipelineDeploymentType = string;
+
+export type Pipeline = {
+  id?: number | string;
+  appCode: string;
+  bitbucketProjectName: string;
+  moduleName: string;
+  deploymentType: PipelineDeploymentType;
+};
+
 export type BitbucketBranchingMetadata = {
   id?: number | string;
   branchingEnabled?: boolean;
@@ -91,6 +101,30 @@ const DUMMY_EAR_APPS: EarApplicationPayload[] = [
   },
 ];
 
+const DUMMY_PIPELINES: Pipeline[] = [
+  // {
+  //   id: '1',
+  //   appCode: 'PAY',
+  //   bitbucketProjectName: 'PAY',
+  //   moduleName: 'payments-service',
+  //   deploymentType: 'Kustomize',
+  // },
+  // {
+  //   id: '2',
+  //   appCode: 'IDP',
+  //   bitbucketProjectName: 'IDP',
+  //   moduleName: 'identity-portal',
+  //   deploymentType: 'Cloud (AWS)',
+  // },
+  // {
+  //   id: '3',
+  //   appCode: 'CAT',
+  //   bitbucketProjectName: 'CAT',
+  //   moduleName: 'catalog-gateway',
+  //   deploymentType: 'Custom',
+  // },
+];
+
 const DUMMY_BITBUCKET_BRANCHING: BitbucketBranchingMetadata[] = [
   {
     id: 1,
@@ -153,6 +187,8 @@ export interface DdpApi {
   createOrUpdateBitbucketBranchingMetadata(
     payload: BitbucketBranchingMetadata,
   ): Promise<unknown>;
+  getAllPipelines(): Promise<Pipeline[]>;
+  createOrUpdatePipeline(payload: Pipeline): Promise<Pipeline>;
 }
 
 export const ddpApiRef = createApiRef<DdpApi>({
@@ -164,6 +200,7 @@ export class DdpApiClient implements DdpApi {
   private branchingMetadata: BitbucketBranchingMetadata[] = [
     ...DUMMY_BITBUCKET_BRANCHING,
   ];
+  private pipelines: Pipeline[] = [...DUMMY_PIPELINES];
 
   constructor(
     private readonly discoveryApi: DiscoveryApi,
@@ -263,5 +300,44 @@ export class DdpApiClient implements DdpApi {
     };
     this.branchingMetadata.push(created);
     return created;
+  }
+
+  async getAllPipelines(): Promise<Pipeline[]> {
+    // Dummy data for local UI. Replace with proxy API call when backend is ready.
+    return this.pipelines.map(pipeline => ({ ...pipeline }));
+  }
+
+  async createOrUpdatePipeline(payload: Pipeline): Promise<Pipeline> {
+    // Dummy in-memory create/update. Replace with proxy API call when backend is ready.
+    const payloadId =
+      payload.id !== undefined && payload.id !== null && payload.id !== ''
+        ? String(payload.id)
+        : '';
+    const existingIndex = this.pipelines.findIndex(pipeline => {
+      if (payloadId) {
+        return String(pipeline.id) === payloadId;
+      }
+      return (
+        pipeline.appCode === payload.appCode &&
+        pipeline.bitbucketProjectName === payload.bitbucketProjectName &&
+        pipeline.moduleName === payload.moduleName
+      );
+    });
+
+    if (existingIndex >= 0) {
+      this.pipelines[existingIndex] = {
+        ...this.pipelines[existingIndex],
+        ...payload,
+        id: this.pipelines[existingIndex].id,
+      };
+      return { ...this.pipelines[existingIndex] };
+    }
+
+    const created: Pipeline = {
+      ...payload,
+      id: String(this.pipelines.length + 1),
+    };
+    this.pipelines.push(created);
+    return { ...created };
   }
 }

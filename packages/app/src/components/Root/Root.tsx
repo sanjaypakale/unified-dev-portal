@@ -6,6 +6,7 @@ import LibraryBooks from '@material-ui/icons/LibraryBooks';
 import CreateComponentIcon from '@material-ui/icons/AddCircleOutline';
 import AppsIcon from '@material-ui/icons/Apps';
 import CallSplitIcon from '@material-ui/icons/CallSplit';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import LogoFull from './LogoFull';
 import LogoIcon from './LogoIcon';
 import {
@@ -88,6 +89,7 @@ export const Root = ({ children }: PropsWithChildren<{}>) => (
           to="admin/bitbucket-branching-strategy"
           text="Bitbucket Branching"
         />
+        <SidebarItem icon={AccountTreeIcon} to="pipelines" text="Pipelines" />
         {/* End global nav */}
         <SidebarDivider />
         <SidebarScrollWrapper>
