@@ -7,9 +7,10 @@ import ViewModuleIcon from '@material-ui/icons/ViewModule';
 import CloudQueueIcon from '@material-ui/icons/CloudQueue';
 import CloudIcon from '@material-ui/icons/Cloud';
 import CloudDoneIcon from '@material-ui/icons/CloudDone';
-import TuneIcon from '@material-ui/icons/Tune';
-import ExtensionIcon from '@material-ui/icons/Extension';
 import LayersIcon from '@material-ui/icons/Layers';
+import AllInboxIcon from '@material-ui/icons/AllInbox';
+import DescriptionIcon from '@material-ui/icons/Description';
+import ExtensionIcon from '@material-ui/icons/Extension';
 
 const ICONS: Record<string, ComponentType<SvgIconProps>> = {
   openshift: WidgetsIcon,
@@ -20,9 +21,10 @@ const ICONS: Record<string, ComponentType<SvgIconProps>> = {
   aws: CloudIcon,
   azure: CloudQueueIcon,
   gcp: CloudDoneIcon,
-  customize: TuneIcon,
-  other: ExtensionIcon,
   kustomize: LayersIcon,
+  helm: AllInboxIcon,
+  'kubernetes-manifest': DescriptionIcon,
+  other: ExtensionIcon,
 };
 
 type OptionIconProps = {

@@ -114,18 +114,6 @@ jenkins:
   username: ${JENKINS_USERNAME}
   apiKey: ${JENKINS_API_KEY}
 
-# Cloud cards on the pipeline wizard. Add another entry to offer a new provider.
+# Comma-separated cloud providers shown on the pipeline wizard.
 pipelines:
-  cloudProviders:
-    - id: aws
-      title: AWS
-      icon: aws
-      deploymentType: 'Cloud (AWS)'
-    - id: azure
-      title: Azure
-      icon: azure
-      deploymentType: 'Cloud (Azure)'
-    - id: gcp
-      title: GCP
-      icon: gcp
-      deploymentType: 'Cloud (GCP)'
+  cloudProviders: AWS, AZURE, GCP

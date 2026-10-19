@@ -16,7 +16,7 @@ import { alertApiRef, useApi } from '@backstage/core-plugin-api';
 import { ddpApiRef } from '../../api/DdpApi';
 import { PipelinesEmptyState } from './PipelinesEmptyState';
 import { PipelineForm, toPipelineForm } from './types';
-import { CREATE_PIPELINE_PATH } from './create';
+import { CREATE_PIPELINE_PATH, reonboardPath } from './create';
 
 const columns: TableColumn<PipelineForm>[] = [
   { title: 'AppCode', field: 'appCode', highlight: true },
@@ -27,8 +27,15 @@ const columns: TableColumn<PipelineForm>[] = [
     title: 'Action',
     sorting: false,
     searchable: false,
-    render: () => (
-      <Button size="small" variant="outlined" color="primary" type="button">
+    render: row => (
+      <Button
+        component={RouterLink}
+        to={reonboardPath(row.id)}
+        size="small"
+        variant="outlined"
+        color="primary"
+        disabled={!row.id}
+      >
         Reonboard
       </Button>
     ),

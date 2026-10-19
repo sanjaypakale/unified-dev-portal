@@ -64,6 +64,10 @@ describe('PipelinesPage', () => {
     expect(screen.getByText('Kustomize')).toBeInTheDocument();
     expect(screen.getByText('Cloud (AWS)')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Reonboard' })).toHaveLength(2);
+    expect(screen.getAllByRole('button', { name: 'Reonboard' })[0]).toHaveAttribute(
+      'href',
+      '/pipelines/1/reonboard',
+    );
     expect(
       screen.getByRole('button', { name: 'Create a Pipeline' }),
     ).toHaveAttribute('href', '/pipelines/create');
@@ -96,6 +100,7 @@ describe('PipelinesPage', () => {
   it('shows a Reonboard button without opening a dialog', async () => {
     renderPage();
     const reonboard = await screen.findAllByRole('button', { name: 'Reonboard' });
+    expect(reonboard[0]).toHaveAttribute('href', '/pipelines/1/reonboard');
     fireEvent.click(reonboard[0]);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

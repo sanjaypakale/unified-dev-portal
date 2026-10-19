@@ -20,6 +20,9 @@ export type Pipeline = {
   bitbucketProjectName: string;
   moduleName: string;
   deploymentType: PipelineDeploymentType;
+  targetId?: string;
+  platformId?: string;
+  typeId?: string;
 };
 
 export type BitbucketBranchingMetadata = {
@@ -102,27 +105,27 @@ const DUMMY_EAR_APPS: EarApplicationPayload[] = [
 ];
 
 const DUMMY_PIPELINES: Pipeline[] = [
-  // {
-  //   id: '1',
-  //   appCode: 'PAY',
-  //   bitbucketProjectName: 'PAY',
-  //   moduleName: 'payments-service',
-  //   deploymentType: 'Kustomize',
-  // },
-  // {
-  //   id: '2',
-  //   appCode: 'IDP',
-  //   bitbucketProjectName: 'IDP',
-  //   moduleName: 'identity-portal',
-  //   deploymentType: 'Cloud (AWS)',
-  // },
-  // {
-  //   id: '3',
-  //   appCode: 'CAT',
-  //   bitbucketProjectName: 'CAT',
-  //   moduleName: 'catalog-gateway',
-  //   deploymentType: 'Custom',
-  // },
+  {
+    id: '1',
+    appCode: 'PAY',
+    bitbucketProjectName: 'PAY',
+    moduleName: 'payments-service',
+    deploymentType: 'Kustomize',
+  },
+  {
+    id: '2',
+    appCode: 'IDP',
+    bitbucketProjectName: 'IDP',
+    moduleName: 'identity-portal',
+    deploymentType: 'Cloud (AWS)',
+  },
+  {
+    id: '3',
+    appCode: 'CAT',
+    bitbucketProjectName: 'CAT',
+    moduleName: 'catalog-gateway',
+    deploymentType: 'Custom',
+  },
 ];
 
 const DUMMY_BITBUCKET_BRANCHING: BitbucketBranchingMetadata[] = [
@@ -205,7 +208,7 @@ export class DdpApiClient implements DdpApi {
   constructor(
     private readonly discoveryApi: DiscoveryApi,
     private readonly fetchApi: FetchApi,
-  ) {}
+  ) { }
 
   async getBitbucketRepoPermission(
     projectKey: string,
@@ -280,7 +283,7 @@ export class DdpApiClient implements DdpApi {
       return (
         String(record.uniqueAppCode) === String(payload.uniqueAppCode) &&
         String(record.bitbucketProjectKey) ===
-          String(payload.bitbucketProjectKey) &&
+        String(payload.bitbucketProjectKey) &&
         String(record.repositoryName) === String(payload.repositoryName)
       );
     });

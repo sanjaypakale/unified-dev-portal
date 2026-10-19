@@ -1,32 +1,26 @@
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
-import { DEFAULT_CLOUD_OPTIONS, WizardOption } from './wizardOptions';
+import { WizardOption } from './wizardOptions';
 
-const readProvider = (
-  getString: (key: string) => string,
-  getOptionalString: (key: string) => string | undefined,
-): WizardOption => {
-  const id = getString('id');
-  const title = getString('title');
-  return {
-    id,
-    title,
-    icon: getOptionalString('icon') || 'cloud',
-    deploymentTypeLabel:
-      getOptionalString('deploymentType') || `Cloud (${title})`,
-  };
+const DEFAULT_CLOUD_PROVIDERS = 'AWS, AZURE, GCP';
+
+export const parseCloudProviders = (value?: string): WizardOption[] => {
+  const names = (value || DEFAULT_CLOUD_PROVIDERS)
+    .split(',')
+    .map(name => name.trim())
+    .filter(Boolean);
+
+  return names.map(title => {
+    const id = title.toLowerCase().replace(/\s+/g, '-');
+    return {
+      id,
+      title,
+      icon: id,
+      deploymentTypeLabel: title,
+    };
+  });
 };
 
 export const useCloudProviderOptions = (): WizardOption[] => {
   const config = useApi(configApiRef);
-  const configured = config.getOptionalConfigArray?.('pipelines.cloudProviders');
-  if (!configured?.length) {
-    return DEFAULT_CLOUD_OPTIONS;
-  }
-
-  return configured.map(entry =>
-    readProvider(
-      key => entry.getString(key),
-      key => entry.getOptionalString(key),
-    ),
-  );
+  return parseCloudProviders(config.getOptionalString('pipelines.cloudProviders'));
 };

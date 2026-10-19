@@ -117,12 +117,16 @@ const routes = (
       path="/admin/bitbucket-branching-strategy"
       element={<BitbucketBranchingStrategyPage />}
     />
+    <Route path="/pipelines/create/onboard" element={<OnboardApplicationPage />} />
     <Route
-      path="/pipelines/create/:workloadId/:platformId/:typeId/onboard"
+      path="/pipelines/:pipelineId/reonboard/onboard"
       element={<OnboardApplicationPage />}
     />
-    <Route path="/pipelines/create/*" element={<CreatePipelineWizard />} />
     <Route path="/pipelines/create" element={<CreatePipelineWizard />} />
+    <Route
+      path="/pipelines/:pipelineId/reonboard"
+      element={<CreatePipelineWizard />}
+    />
     <Route path={PIPELINES_PATH} element={<PipelinesPage />} />
   </FlatRoutes>
 );

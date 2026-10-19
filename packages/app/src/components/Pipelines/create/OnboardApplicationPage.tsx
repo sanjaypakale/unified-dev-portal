@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import {
@@ -9,29 +9,38 @@ import {
 } from '@backstage/core-components';
 import { useCloudProviderOptions } from './cloudProviders';
 import { useCreatePipelineStyles } from './createPipeline.styles';
-import { readWizardPath, wizardPath } from './paths';
+import {
+  CREATE_PIPELINE_PATH,
+  readOnboardSearch,
+  reonboardPath,
+} from './paths';
 import {
   CLOUD_PLATFORM_ID,
-  CONTAINER_SERVICE_OPTIONS,
+  CONTAINER_SERVICE_ID,
+  DEPLOYMENT_TARGET_OPTIONS,
   findOption,
-  OPENSHIFT_WORKLOAD_ID,
+  OPENSHIFT_METHOD_OPTIONS,
+  OTHERS_PLATFORM_ID,
   PLATFORM_OPTIONS,
-  WORKLOAD_OPTIONS,
 } from './wizardOptions';
 
 export const OnboardApplicationPage = () => {
   const classes = useCreatePipelineStyles();
   const navigate = useNavigate();
   const location = useLocation();
+  const { pipelineId } = useParams();
   const cloudOptions = useCloudProviderOptions();
-  const { workloadId, platformId, typeId } = readWizardPath(location.pathname);
-  const workload = findOption(WORKLOAD_OPTIONS, workloadId);
+  const { targetId, platformId, typeId, step } = readOnboardSearch(location.search);
+  const target = findOption(DEPLOYMENT_TARGET_OPTIONS, targetId);
   const platform = findOption(PLATFORM_OPTIONS, platformId);
   const typeOptions =
-    platformId === CLOUD_PLATFORM_ID ? cloudOptions : CONTAINER_SERVICE_OPTIONS;
-  const deploymentType = findOption(typeOptions, typeId);
+    platformId === CLOUD_PLATFORM_ID ? cloudOptions : OPENSHIFT_METHOD_OPTIONS;
+  const deploymentType =
+    platformId === OTHERS_PLATFORM_ID
+      ? platform
+      : findOption(typeOptions, typeId);
   const ready =
-    workload?.id === OPENSHIFT_WORKLOAD_ID &&
+    target?.id === CONTAINER_SERVICE_ID &&
     Boolean(platform) &&
     Boolean(deploymentType?.deploymentTypeLabel);
 
@@ -46,13 +55,11 @@ export const OnboardApplicationPage = () => {
       <Content>
         {ready ? (
           <Typography className={classes.summary}>
-            {workload?.title} / {platform?.title} /{' '}
+            {target?.title} / {platform?.title} /{' '}
             {deploymentType?.deploymentTypeLabel}
           </Typography>
         ) : (
-          <Typography>
-            Choose an OpenShift Container deployment before continuing.
-          </Typography>
+          <Typography>Choose Container Service before continuing.</Typography>
         )}
         <Typography className={classes.helper}>
           The onboard form will be added on this page.
@@ -62,8 +69,8 @@ export const OnboardApplicationPage = () => {
             variant="outlined"
             startIcon={<ArrowBackIcon />}
             onClick={() =>
-              navigate(wizardPath(workloadId, platformId), {
-                state: { selectedId: typeId },
+              navigate(pipelineId ? reonboardPath(pipelineId) : CREATE_PIPELINE_PATH, {
+                state: { targetId, platformId, typeId, step },
               })
             }
           >
