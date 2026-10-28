@@ -1,6 +1,6 @@
 import { Pipeline, PipelineDeploymentType } from '../../api/DdpApi';
 
-export const PIPELINES_PATH = '/pipelines';
+export const PIPELINES_PATH = '/pipeline/cd-pipeline';
 
 export type PipelineForm = {
   id: string;

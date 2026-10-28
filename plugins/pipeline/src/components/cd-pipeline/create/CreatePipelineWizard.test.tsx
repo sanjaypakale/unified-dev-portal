@@ -19,7 +19,7 @@ const Pathname = () => {
 };
 
 const renderWizard = (
-  initialPath = '/pipelines/create',
+  initialPath = '/pipeline/cd-pipeline/create',
   pipelines: Pipeline[] = [],
 ) => {
   const ddpApi = {
@@ -36,14 +36,14 @@ const renderWizard = (
       >
         <Pathname />
         <Routes>
-          <Route path="/pipelines/create/onboard" element={<OnboardApplicationPage />} />
+          <Route path="/pipeline/cd-pipeline/create/onboard" element={<OnboardApplicationPage />} />
           <Route
-            path="/pipelines/:pipelineId/reonboard/onboard"
+            path="/pipeline/cd-pipeline/:pipelineId/reonboard/onboard"
             element={<OnboardApplicationPage />}
           />
-          <Route path="/pipelines/create" element={<CreatePipelineWizard />} />
+          <Route path="/pipeline/cd-pipeline/create" element={<CreatePipelineWizard />} />
           <Route
-            path="/pipelines/:pipelineId/reonboard"
+            path="/pipeline/cd-pipeline/:pipelineId/reonboard"
             element={<CreatePipelineWizard />}
           />
         </Routes>
@@ -74,7 +74,7 @@ describe('Create pipeline wizard', () => {
     expect(
       screen.getByText('This deployment type is not available yet.'),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('pathname')).toHaveTextContent(/^\/pipelines\/create$/);
+    expect(screen.getByTestId('pathname')).toHaveTextContent(/^\/pipeline\/cd-pipeline\/create$/);
   });
 
   it('reveals later choices in the same step', async () => {
@@ -87,7 +87,7 @@ describe('Create pipeline wizard', () => {
     expect(screen.getByRole('button', { name: 'Red Hat Openshift' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cloud' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Others' })).toBeInTheDocument();
-    expect(screen.getByTestId('pathname')).toHaveTextContent(/^\/pipelines\/create$/);
+    expect(screen.getByTestId('pathname')).toHaveTextContent(/^\/pipeline\/cd-pipeline\/create$/);
 
     clickCard('Red Hat Openshift');
     expect(screen.getByRole('button', { name: 'Kustomize' })).toBeInTheDocument();
@@ -105,7 +105,7 @@ describe('Create pipeline wizard', () => {
       screen.getByText('Container Service / Red Hat Openshift / Helm'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('pathname')).toHaveTextContent(
-      '/pipelines/create/onboard',
+      '/pipeline/cd-pipeline/create/onboard',
     );
   });
 
@@ -118,7 +118,7 @@ describe('Create pipeline wizard', () => {
     clickCard('Container Service');
     clickCard('Cloud');
     expect(screen.getByText('Cloud provider')).toBeInTheDocument();
-    expect(screen.getByTestId('pathname')).toHaveTextContent(/^\/pipelines\/create$/);
+    expect(screen.getByTestId('pathname')).toHaveTextContent(/^\/pipeline\/cd-pipeline\/create$/);
     expect(screen.getByRole('button', { name: 'AWS' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'AZURE' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'GCP' })).toBeInTheDocument();
@@ -131,7 +131,7 @@ describe('Create pipeline wizard', () => {
   });
 
   it('opens reonboard with every saved choice visible and allows a different option', async () => {
-    renderWizard('/pipelines/1/reonboard', [
+    renderWizard('/pipeline/cd-pipeline/1/reonboard', [
       {
         id: '1',
         appCode: 'PAY',
@@ -161,7 +161,7 @@ describe('Create pipeline wizard', () => {
       await screen.findByText('Container Service / Cloud / AWS'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('pathname')).toHaveTextContent(
-      '/pipelines/1/reonboard/onboard',
+      '/pipeline/cd-pipeline/1/reonboard/onboard',
     );
   });
 });

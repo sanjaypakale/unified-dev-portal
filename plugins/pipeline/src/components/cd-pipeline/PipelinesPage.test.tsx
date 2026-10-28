@@ -66,11 +66,11 @@ describe('PipelinesPage', () => {
     expect(screen.getAllByRole('button', { name: 'Reonboard' })).toHaveLength(2);
     expect(screen.getAllByRole('button', { name: 'Reonboard' })[0]).toHaveAttribute(
       'href',
-      '/pipelines/1/reonboard',
+      '/pipeline/cd-pipeline/1/reonboard',
     );
     expect(
       screen.getByRole('button', { name: 'Create a Pipeline' }),
-    ).toHaveAttribute('href', '/pipelines/create');
+    ).toHaveAttribute('href', '/pipeline/cd-pipeline/create');
   });
 
   it('shows the empty state when there are no pipelines', async () => {
@@ -81,7 +81,7 @@ describe('PipelinesPage', () => {
     expect(screen.getByText('No pipelines')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Create a Pipeline' }),
-    ).toHaveAttribute('href', '/pipelines/create');
+    ).toHaveAttribute('href', '/pipeline/cd-pipeline/create');
     expect(screen.queryByText('Create with AI')).not.toBeInTheDocument();
     expect(screen.queryByText('Select Repository')).not.toBeInTheDocument();
   });
@@ -93,14 +93,14 @@ describe('PipelinesPage', () => {
 
     expect(
       screen.getByRole('button', { name: 'Create a Pipeline' }),
-    ).toHaveAttribute('href', '/pipelines/create');
+    ).toHaveAttribute('href', '/pipeline/cd-pipeline/create');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('shows a Reonboard button without opening a dialog', async () => {
     renderPage();
     const reonboard = await screen.findAllByRole('button', { name: 'Reonboard' });
-    expect(reonboard[0]).toHaveAttribute('href', '/pipelines/1/reonboard');
+    expect(reonboard[0]).toHaveAttribute('href', '/pipeline/cd-pipeline/1/reonboard');
     fireEvent.click(reonboard[0]);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

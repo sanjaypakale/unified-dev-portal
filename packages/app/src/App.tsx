@@ -40,11 +40,12 @@ import {
 } from './components/value-stream';
 import { CreateApplicationEarPage } from './components/CreateApplicationEar';
 import { BitbucketBranchingStrategyPage } from './components/BitbucketBranchingStrategy';
-import { PIPELINES_PATH, PipelinesPage } from './components/Pipelines';
 import {
   CreatePipelineWizard,
   OnboardApplicationPage,
-} from './components/Pipelines/create';
+  PipelinePage,
+  PipelinesPage,
+} from '@internal/plugin-pipeline';
 
 const app = createApp({
   apis,
@@ -117,17 +118,24 @@ const routes = (
       path="/admin/bitbucket-branching-strategy"
       element={<BitbucketBranchingStrategyPage />}
     />
-    <Route path="/pipelines/create/onboard" element={<OnboardApplicationPage />} />
     <Route
-      path="/pipelines/:pipelineId/reonboard/onboard"
+      path="/pipeline/cd-pipeline/create/onboard"
       element={<OnboardApplicationPage />}
     />
-    <Route path="/pipelines/create" element={<CreatePipelineWizard />} />
     <Route
-      path="/pipelines/:pipelineId/reonboard"
+      path="/pipeline/cd-pipeline/:pipelineId/reonboard/onboard"
+      element={<OnboardApplicationPage />}
+    />
+    <Route
+      path="/pipeline/cd-pipeline/create"
       element={<CreatePipelineWizard />}
     />
-    <Route path={PIPELINES_PATH} element={<PipelinesPage />} />
+    <Route
+      path="/pipeline/cd-pipeline/:pipelineId/reonboard"
+      element={<CreatePipelineWizard />}
+    />
+    <Route path="/pipeline/cd-pipeline" element={<PipelinesPage />} />
+    <Route path="/pipeline" element={<PipelinePage />} />
   </FlatRoutes>
 );
 
