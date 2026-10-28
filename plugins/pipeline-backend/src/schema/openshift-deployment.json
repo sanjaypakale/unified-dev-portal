@@ -1,0 +1,238 @@
+{
+  "id": "openshift-deployment",
+  "groups": [
+    {
+      "id": "derived",
+      "title": "Derived values",
+      "fields": [
+        { "key": "APP_CODE", "widget": "hidden", "output": { "fromContext": "appCode" } },
+        { "key": "MODULE_NAME", "widget": "hidden", "output": { "fromContext": "moduleName" } },
+        { "key": "COUNTRY_CODE", "widget": "hidden", "output": { "fromContext": "countryCode" } },
+        { "key": "SIT_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "sitArtRepoName" } },
+        { "key": "UAT_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "uatArtRepoName" } },
+        { "key": "PRD_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "prdArtRepoName" } },
+        { "key": "CLUSTER_NAME", "widget": "hidden", "output": { "fromContext": "platform" } },
+        { "key": "DEPLOY_TYPE", "widget": "hidden", "output": { "fromContext": "deploymentType" } },
+        { "key": "MODULE_PROPS_FILE_PATH", "widget": "hidden", "output": { "fromContext": "modulePropsFilePath" } },
+        { "key": "SIT_APP_OC_CREDENTIAL_ID", "widget": "hidden", "output": { "template": "INT-T-<APP_CODE>-ECP" } },
+        { "key": "UAT_APP_OC_CREDENTIAL_ID", "widget": "hidden", "output": { "template": "INT-U-<APP_CODE>-ECP" } },
+        { "key": "PRD_APP_ADC_OC_CREDENTIAL_ID", "widget": "hidden", "output": { "template": "INT-P-<APP_CODE>-ECP" } },
+        { "key": "PRD_APP_TDC_OC_CREDENTIAL_ID", "widget": "hidden", "output": { "template": "INT-P-<APP_CODE>-ECP" } },
+        { "key": "COMMON_CONFIG_MAP_DIRECTORY_PATH", "widget": "hidden", "output": { "constant": "common" } },
+        { "key": "COMMON_SECRETS_DIRECTORY_PATH", "widget": "hidden", "output": { "constant": "common" } },
+        { "key": "CONFIG_MAP_DIRECTORY_PATH", "widget": "hidden", "output": { "constant": "DEPLOY_NAMESPACE" } },
+        { "key": "SECRETS_DIRECTORY_PATH", "widget": "hidden", "output": { "constant": "DEPLOY_NAMESPACE" } }
+      ]
+    },
+    {
+      "id": "image",
+      "title": "Image",
+      "fields": [
+        {
+          "key": "IS_VENDOR",
+          "label": "Is it a vendor image?",
+          "widget": "select",
+          "required": true,
+          "defaultValue": "no",
+          "options": [
+            { "label": "Yes", "value": "yes" },
+            { "label": "No", "value": "no" }
+          ],
+          "output": { "map": { "yes": "true", "no": "false" } }
+        },
+        {
+          "key": "MULTI_IMAGE",
+          "label": "Is multi Image deployment",
+          "widget": "select",
+          "required": true,
+          "defaultValue": "no",
+          "options": [
+            { "label": "Yes", "value": "yes" },
+            { "label": "No", "value": "no" }
+          ],
+          "write": false
+        },
+        {
+          "key": "IMAGES_FILE_PATH",
+          "widget": "hidden",
+          "output": {
+            "constant": "images.yaml",
+            "when": { "field": "MULTI_IMAGE", "equals": "yes" }
+          }
+        }
+      ]
+    },
+    {
+      "id": "openshift-urls",
+      "title": "OpenShift URLs",
+      "fields": [
+        {
+          "key": "SIT_OC_URL",
+          "label": "Enter SIT OC URL",
+          "widget": "text",
+          "required": true,
+          "errorMessage": "SIT oc url is required"
+        },
+        {
+          "key": "UAT_OC_URL",
+          "label": "Enter UAT OC URL",
+          "widget": "text",
+          "required": true,
+          "errorMessage": "UAT oc url is required"
+        },
+        {
+          "key": "ADC_OC_URL",
+          "label": "Enter ADC OC URL",
+          "widget": "text",
+          "errorMessage": "ADC oc url is required"
+        },
+        {
+          "key": "TDC_OC_URL",
+          "label": "Enter TDC OC URL",
+          "widget": "text",
+          "errorMessage": "TDC oc url is required"
+        }
+      ]
+    },
+    {
+      "id": "jenkins-clouds",
+      "title": "Jenkins clouds",
+      "fields": [
+        {
+          "key": "SIT_CLOUD",
+          "label": "Enter SIT Jenkins Cloud name",
+          "widget": "text",
+          "required": true,
+          "errorMessage": "Enter SIT Jenkins Cloud name"
+        },
+        {
+          "key": "UAT_CLOUD",
+          "label": "Enter UAT Jenkins Cloud name",
+          "widget": "text",
+          "required": true,
+          "errorMessage": "Enter UAT Jenkins Cloud name"
+        },
+        {
+          "key": "PRD_CLOUD",
+          "label": "Enter PROD Jenkins Cloud name",
+          "widget": "text",
+          "errorMessage": "Enter PROD Jenkins Cloud name"
+        },
+        {
+          "key": "DR_CLOUD",
+          "label": "Enter DR Jenkins Cloud name",
+          "widget": "text",
+          "errorMessage": "Enter DR Jenkins Cloud name"
+        }
+      ]
+    },
+    {
+      "id": "cluster",
+      "title": "Cluster",
+      "fields": [
+        {
+          "key": "CLUSTER_NETWORK",
+          "label": "Cluster Network",
+          "widget": "select",
+          "required": true,
+          "options": [
+            { "label": "ECOM", "value": "ECOM" },
+            { "label": "DMZ", "value": "DMZ" },
+            { "label": "ENT", "value": "ENT" }
+          ]
+        },
+        {
+          "key": "IS_QUAY",
+          "label": "Is it Quay registry",
+          "widget": "select",
+          "defaultValue": "no",
+          "options": [
+            { "label": "Yes", "value": "yes" },
+            { "label": "No", "value": "no" }
+          ],
+          "output": { "map": { "yes": "true", "no": "false" } }
+        }
+      ]
+    },
+    {
+      "id": "docker-repos",
+      "title": "Docker repositories",
+      "fields": [
+        { "key": "SIT_DOCKER_REPO_NAME", "label": "SIT Docker repository name", "widget": "text" },
+        { "key": "UAT_DOCKER_REPO_NAME", "label": "UAT Docker repository name", "widget": "text" },
+        { "key": "PRD_DOCKER_REPO_NAME", "label": "PRD Docker repository name", "widget": "text" }
+      ]
+    },
+    {
+      "id": "agents",
+      "title": "Static agent",
+      "fields": [
+        {
+          "key": "IS_STATIC_AGENT",
+          "label": "Is it static agent",
+          "widget": "select",
+          "defaultValue": "no",
+          "options": [
+            { "label": "Yes", "value": "yes" },
+            { "label": "No", "value": "no" }
+          ],
+          "output": { "map": { "yes": "true", "no": "false" } }
+        },
+        {
+          "key": "SIT_NODE",
+          "label": "Enter SIT Agent Name",
+          "widget": "text",
+          "visible": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "required": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "errorMessage": "Enter SIT Agent Name"
+        },
+        {
+          "key": "UAT_NODE",
+          "label": "Enter UAT Agent Name",
+          "widget": "text",
+          "visible": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "required": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "errorMessage": "Enter UAT Agent Name"
+        },
+        {
+          "key": "PDN_ADC_NODE",
+          "label": "Enter Prod ADC Agent Name",
+          "widget": "text",
+          "visible": { "field": "IS_STATIC_AGENT", "equals": "yes" }
+        },
+        {
+          "key": "PDN_TDC_NODE",
+          "label": "Enter PROD TDC Agent Name",
+          "widget": "text",
+          "visible": { "field": "IS_STATIC_AGENT", "equals": "yes" }
+        },
+        {
+          "key": "COSIGN_UTILITY_PATH",
+          "label": "Enter COSIGN Utility Path",
+          "widget": "text",
+          "visible": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "required": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "errorMessage": "Enter COSIGN Utility Path"
+        },
+        {
+          "key": "PRD_STATIC_CERT_PATH",
+          "label": "Enter Prod Cert Path",
+          "widget": "text",
+          "visible": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "required": { "field": "IS_STATIC_AGENT", "equals": "yes" },
+          "errorMessage": "Enter Prod Cert Path"
+        }
+      ]
+    },
+    {
+      "id": "commands",
+      "title": "Commands",
+      "fields": [
+        { "key": "DEPLOY_COMMAND", "label": "Enter Deployment Command", "widget": "text" },
+        { "key": "ROLLOUT_COMMAND", "label": "Enter Rollout Command", "widget": "text" },
+        { "key": "ROLLBACK_COMMAND", "label": "Enter Rollback Command", "widget": "text" },
+        { "key": "GET_JOB_NAME", "label": "Deployment Job Name Command", "widget": "text" }
+      ]
+    }
+  ]
+}

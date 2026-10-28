@@ -106,5 +106,6 @@ backend.add(import('@backstage-community/plugin-scaffolder-backend-module-jenkin
 // });
 backend.add(import('@backstage/plugin-auth-backend'));
 backend.add(import('@backstage/plugin-auth-backend-module-github-provider'));
+backend.add(import('@internal/plugin-pipeline-backend'));
 //backend.add(customAuth);
 backend.start();

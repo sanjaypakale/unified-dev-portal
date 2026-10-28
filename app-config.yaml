@@ -29,9 +29,12 @@ backend:
     credentials: true
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
+  # A file per plugin avoids the CLI in-memory DevDataStore, which times out while
+  # the frontend build is running and leaves plugin routes unregistered.
   database:
     client: better-sqlite3
-    connection: ':memory:'
+    connection:
+      directory: .local/sqlite
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:

@@ -1,0 +1,209 @@
+deployment type is Kustomize
+
+APP_CODE
+MODULE_NAME ==> derive from bitbucket repository
+COUNTRY_CODE
+— no need to show in UI only should available in properties file
+SIT_ART_REPO_NAME
+UAT_ART_REPO_NAME
+PRD_ART_REPO_NAME
+CLUSTER_NAME
+based on selected Container platform in wizard value should below
+Red Hat Openshift -> redhat, Cloud -> cloud, Others-> others
+IS_VENDOR
+Label : Is it a vendor image?
+Values: Yes, No in UI
+property file ==> true or false
+DEPLOY_TYPE
+Label: Deployment Type
+Values: 1. if Kustomize then kustomize, 2. If Helmn then helm , 3. Kubernetes Manifest then blank
+property file=> kustomize or helm or blank
+=kustomize
+MODULE_PROPS_FILE_PATH
+for helm
+DEPLOY_TYPE=helm
+MODULE_PROPS_FILE_PATH=Chart.yaml
+for kustomize
+DEPLOY_TYPE=kustomize
+MODULE_PROPS_FILE_PATH=Version.properties
+for other
+DEPLOY_TYPE=
+MODULE_PROPS_FILE_PATH=Version.properties
+Label: Is multi Image deployment
+Values: Yes or No
+Do not show in properties file
+IMAGES_FILE_PATH
+Is multi Image deployment yes add below values in properties file
+IMAGES_FILE_PATH=images.yaml
+SIT_OC_URL
+Label: Enter SIT OC URL
+Value: Textfield capture value
+condition : required
+Error message: SIT oc url is required
+Need this field in Propretiy file
+
+UAT_OC_URL
+Label: Enter UAT OC URL
+Value: Textfield capture value
+condition : required
+Error message: UAT oc url is required
+Need this field in Propretiy file
+
+ADC_OC_URL
+Label: Enter ADC OC URL
+Value: Textfield capture value
+condition : optional
+Error message: ADC oc url is required
+Need this field in Propretiy file
+
+TDC_OC_URL
+Label: Enter TDC OC URL
+Value: Textfield capture value
+condition : optional
+Error message: TDC oc url is required
+Need this field in Propretiy file
+
+SIT_CLOUD
+Label: Enter SIT Jenkins Cloud name
+value: Textfield capture value
+condition : required
+Error message: Enter SIT Jenkins Cloud name
+Need this field in Propretiy file
+
+UAT_CLOUD
+Label: Enter UAT Jenkins Cloud name
+value: Textfield capture value
+condition : required
+Error message: Enter UAT Jenkins Cloud name
+Need this field in Propretiy file
+
+PRD_CLOUD
+Label: Enter PROD Jenkins Cloud name
+value: Textfield capture value
+condition : Optional
+Error message: Enter PROD Jenkins Cloud name
+Need this field in Propretiy file
+
+DR_CLOUD
+Label: Enter DR Jenkins Cloud name
+value: Textfield capture value
+condition : Optional
+Error message: Enter DR Jenkins Cloud name
+Need this field in Propretiy file
+
+SIT_APP_OC_CREDENTIAL_ID
+Do not show in UI.
+Dyanamically append values in properties file only. Below is example
+SIT_APP_OC_CREDENTIAL_ID=INT-T-<APP_CODE>-ECP
+
+UAT_APP_OC_CREDENTIAL_ID
+Do not show in In UI.
+Dyanamically append values in properties file only. Below is example
+UAT_APP_OC_CREDENTIAL_ID=INT-U-<APP_CODE>-ECP
+
+PRD_APP_ADC_OC_CREDENTIAL_ID
+Do not show in In UI.
+Dyanamically append values in properties file only. Below is example
+PRD_APP_ADC_OC_CREDENTIAL_ID=INT-P-<APP_CODE>-ECP
+
+PRD_APP_TDC_OC_CREDENTIAL_ID
+Do not show in In UI.
+Dyanamically append values in properties file only. Below is example
+PRD_APP_TDC_OC_CREDENTIAL_ID=INT-P-<APP_CODE>-ECP
+
+Label: Cluster Network
+Value: ECOM, DMZ, ENT
+field: dropdown
+condition: required
+single select
+
+CLUSTER_NETWORK
+Value should come from Cluster Network dropdown in the property file
+
+Is Quay
+Label: Is it Quay registry
+Value: Yes or No--> default to No
+condition: optional
+
+IS_QUAY
+Value should come from Is it Quay registry field. Default to No
+
+//Refer confluence document for these properties
+SIT_DOCKER_REPO_NAME
+UAT_DOCKER_REPO_NAME
+PRD_DOCKER_REPO_NAME
+//end
+
+Is it Static agent
+Label: Is it static agent
+Value: Yes or No--> default to No
+condition: optional
+
+IS_STATIC_AGENT
+if Is it static agent field value is yes then set this proprety value as true else false
+SIT_NODE
+if Is it static agent field value is yes then
+label: Enter SIT Agent Name
+field: input
+condition: required (if Is it static agent field value is yes )
+error message : Enter SIT Agent Name
+
+UAT_NODE
+if Is it static agent field value is yes then
+label: Enter UAT Agent Name
+field: input
+condition: required (if Is it static agent field value is yes )
+error message : Enter UAT Agent Name
+
+PDN_ADC_NODE
+if Is it static agent field value is yes then
+label: Enter Prod ADC Agent Name
+field: input
+condition: optional (if Is it static agent field value is yes )
+
+PDN_TDC_NODE
+if Is it static agent field value is yes then
+label: Enter PROD TDC Agent Name
+field: input
+condition: optional (if Is it static agent field value is yes )
+
+COSIGN_UTILITY_PATH
+if Is it static agent field value is yes then
+label: Enter COSIGN Utility Path
+field: input
+condition: required (if Is it static agent field value is yes )
+error message : Enter COSIGN Utility Path
+
+PRD_STATIC_CERT_PATH
+if Is it static agent field value is yes then
+label: Enter Prod Cert Path
+field: input
+condition: required (if Is it static agent field value is yes )
+error message : Enter Prod Cert Path
+
+DEPLOY_COMMAND
+label: Enter Deployment Command
+field: textfield
+condition: optional
+
+ROLLOUT_COMMAND
+label : Enter Rollout Command
+field: textfield
+condition: optional
+
+ROLLBACK_COMMAND
+label : Enter Rollback Command
+field: textfield
+condition: optional
+
+GET_JOB_NAME
+label : Deployment Job Name Command
+field: textfield
+condition: optional
+
+//Dont show below fields in ui and just add in properties file
+COMMON_CONFIG_MAP_DIRECTORY_PATH=common
+COMMON_SECRETS_DIRECTORY_PATH=common
+CONFIG_MAP_DIRECTORY_PATH=DEPLOY_NAMESPACE
+SECRETS_DIRECTORY_PATH=DEPLOY_NAMESPACE
+//End

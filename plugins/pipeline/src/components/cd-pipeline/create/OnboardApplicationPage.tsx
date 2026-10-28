@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button, Typography } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -6,6 +7,7 @@ import {
   Header,
   HeaderLabel,
   Page,
+  Progress,
 } from '@backstage/core-components';
 import { useCloudProviderOptions } from './cloudProviders';
 import { useCreatePipelineStyles } from './createPipeline.styles';
@@ -14,6 +16,8 @@ import {
   readOnboardSearch,
   reonboardPath,
 } from './paths';
+import { SchemaForm } from './SchemaForm';
+import { useDeploymentSchema } from './useDeploymentSchema';
 import {
   CLOUD_PLATFORM_ID,
   CONTAINER_SERVICE_ID,
@@ -21,6 +25,7 @@ import {
   findOption,
   OPENSHIFT_METHOD_OPTIONS,
   OTHERS_PLATFORM_ID,
+  OPENSHIFT_PLATFORM_ID,
   PLATFORM_OPTIONS,
 } from './wizardOptions';
 
@@ -43,6 +48,31 @@ export const OnboardApplicationPage = () => {
     target?.id === CONTAINER_SERVICE_ID &&
     Boolean(platform) &&
     Boolean(deploymentType?.deploymentTypeLabel);
+  const method = platformId === OPENSHIFT_PLATFORM_ID ? typeId : undefined;
+  const cloudProvider = platformId === CLOUD_PLATFORM_ID ? typeId : undefined;
+  const { schema, error, loading } = useDeploymentSchema({
+    enabled: ready,
+    method,
+    cloudProvider,
+  });
+  const [values, setValues] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!schema) {
+      return;
+    }
+    setValues(current => {
+      const next = { ...current };
+      schema.groups.forEach(group => {
+        group.fields.forEach(field => {
+          if (next[field.key] === undefined && field.defaultValue) {
+            next[field.key] = field.defaultValue;
+          }
+        });
+      });
+      return next;
+    });
+  }, [schema]);
 
   return (
     <Page themeId="tool">
@@ -61,9 +91,22 @@ export const OnboardApplicationPage = () => {
         ) : (
           <Typography>Choose Container Service before continuing.</Typography>
         )}
-        <Typography className={classes.helper}>
-          The onboard form will be added on this page.
-        </Typography>
+        {ready && loading && <Progress />}
+        {ready && error && (
+          <Typography color="error" className={classes.helper}>
+            {error}
+          </Typography>
+        )}
+        {ready && schema && (
+          <SchemaForm
+            groups={schema.groups}
+            values={values}
+            context={{ platform: platformId, cloudProvider }}
+            onChange={(key, value) =>
+              setValues(current => ({ ...current, [key]: value }))
+            }
+          />
+        )}
         <div className={classes.actions}>
           <Button
             variant="outlined"

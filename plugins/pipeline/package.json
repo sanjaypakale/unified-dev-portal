@@ -14,7 +14,8 @@
     "role": "frontend-plugin",
     "pluginId": "pipeline",
     "pluginPackages": [
-      "@internal/plugin-pipeline"
+      "@internal/plugin-pipeline",
+      "@internal/plugin-pipeline-backend"
     ]
   },
   "sideEffects": false,

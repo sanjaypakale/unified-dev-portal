@@ -45,6 +45,9 @@ site
 # Local configuration files
 *.local.yaml
 
+# Local development databases
+**/.local/
+
 # Sensitive credentials
 *-credentials.yaml
 
