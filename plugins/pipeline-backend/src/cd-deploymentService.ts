@@ -1,6 +1,10 @@
-import { readFile } from 'fs/promises';
 import nunjucks from 'nunjucks';
-import { LoggerService, resolvePackagePath, RootConfigService } from '@backstage/backend-plugin-api';
+import { LoggerService, RootConfigService } from '@backstage/backend-plugin-api';
+import {
+  BitbucketServer,
+  readBitbucketText,
+  requireBitbucketServer,
+} from './bitbucket/bitbucketServer';
 import {
   BITBUCKET_SCHEMA_PROJECT,
   BITBUCKET_SCHEMA_REPOSITORY,
@@ -37,29 +41,6 @@ type BitbucketServer = {
 
 const environment = nunjucks.configure({ autoescape: false });
 
-const readBitbucketServer = (
-  config: RootConfigService,
-): BitbucketServer | undefined => {
-  const server = config.getOptionalConfigArray('integrations.bitbucketServer')?.[0];
-  if (!server) {
-    return undefined;
-  }
-  const host = server.getString('host');
-  const apiBaseUrl = (
-    server.getOptionalString('apiBaseUrl') ?? `https://${host}/rest/api/1.0`
-  ).replace(/\/$/, '');
-  const token = server.getOptionalString('token');
-  const username = server.getOptionalString('username');
-  const password = server.getOptionalString('password');
-  const headers: Record<string, string> = {};
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  } else if (username && password) {
-    headers.Authorization = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
-  }
-  return { apiBaseUrl, headers };
-};
-
 const fileSegment = (value: string | undefined, label: string) => {
   const segment = value?.trim() ?? '';
   if (!segment || /[\\/]/.test(segment) || segment.includes('..')) {
@@ -88,29 +69,13 @@ export const renderDeploymentProperties = (
     .join('\n')}\n`;
 };
 
-const localTemplatePath = () =>
-  resolvePackagePath(
-    '@internal/plugin-pipeline-backend',
-    'src/schema/output/deployment.properties',
+const readRemoteTemplate = (server: BitbucketServer) =>
+  readBitbucketText(
+    server,
+    BITBUCKET_SCHEMA_PROJECT,
+    BITBUCKET_SCHEMA_REPOSITORY,
+    DEPLOYMENT_TEMPLATE_PATH,
   );
-
-const readLocalTemplate = () => readFile(localTemplatePath(), 'utf8');
-
-const rawUrl = (server: BitbucketServer, project: string, repository: string, path: string) =>
-  `${server.apiBaseUrl}/projects/${encodeURIComponent(project)}/repos/${encodeURIComponent(repository)}/raw/${path}`;
-
-const readRemoteTemplate = async (server: BitbucketServer) => {
-  const response = await fetch(
-    rawUrl(server, BITBUCKET_SCHEMA_PROJECT, BITBUCKET_SCHEMA_REPOSITORY, DEPLOYMENT_TEMPLATE_PATH),
-    { headers: server.headers },
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Failed to read ${DEPLOYMENT_TEMPLATE_PATH} (${response.status})`,
-    );
-  }
-  return response.text();
-};
 
 const branchName = async (
   server: BitbucketServer,
@@ -192,55 +157,37 @@ const writeRemoteFile = async (
   }
 };
 
-/** Reads the properties template, fills it, and stores the file in Bitbucket when configured. */
+/** Reads the properties template from Bitbucket and commits the filled file. */
 export const createCdDeploymentService = ({
   config,
   logger,
 }: {
   config: RootConfigService;
   logger: LoggerService;
-}): CdDeploymentService => {
-  const server = readBitbucketServer(config);
-  return {
-    async createPropertiesFile(request) {
-      const appCode = fileSegment(
-        request.appCode || request.values.APP_CODE,
-        'App code',
-      );
-      const moduleName = fileSegment(request.values.MODULE_NAME, 'Module name');
-      const path = deploymentPropertiesPath(appCode, moduleName);
-      let template: string;
-      if (server) {
-        try {
-          template = await readRemoteTemplate(server);
-        } catch (error) {
-          const message = error instanceof Error ? error.message : 'read failed';
-          logger.info(`${message}. Using the local deployment properties template.`);
-          template = await readLocalTemplate();
-        }
-      } else {
-        logger.info(
-          'integrations.bitbucketServer is not configured. The properties file was rendered and not written.',
-        );
-        template = await readLocalTemplate();
-      }
-      const content = renderDeploymentProperties(template, {
-        ...request,
-        appCode,
-      });
-      if (server) {
-        await writeRemoteFile(server, path, content);
-        logger.info(
-          `Wrote ${DEPLOYMENT_OUTPUT_PROJECT}/${DEPLOYMENT_OUTPUT_REPOSITORY}/${path}`,
-        );
-      }
-      return {
-        project: DEPLOYMENT_OUTPUT_PROJECT,
-        repository: DEPLOYMENT_OUTPUT_REPOSITORY,
-        path,
-        content,
-        written: Boolean(server),
-      };
-    },
-  };
-};
+}): CdDeploymentService => ({
+  async createPropertiesFile(request) {
+    const server = requireBitbucketServer(config);
+    const appCode = fileSegment(
+      request.appCode || request.values.APP_CODE,
+      'App code',
+    );
+    const moduleName = fileSegment(request.values.MODULE_NAME, 'Module name');
+    const path = deploymentPropertiesPath(appCode, moduleName);
+    const template = await readRemoteTemplate(server);
+    const content = renderDeploymentProperties(template, {
+      ...request,
+      appCode,
+    });
+    await writeRemoteFile(server, path, content);
+    logger.info(
+      `Wrote ${DEPLOYMENT_OUTPUT_PROJECT}/${DEPLOYMENT_OUTPUT_REPOSITORY}/${path}`,
+    );
+    return {
+      project: DEPLOYMENT_OUTPUT_PROJECT,
+      repository: DEPLOYMENT_OUTPUT_REPOSITORY,
+      path,
+      content,
+      written: true,
+    };
+  },
+});

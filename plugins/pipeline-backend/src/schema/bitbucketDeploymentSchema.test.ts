@@ -1,4 +1,5 @@
 import { LoggerService, RootConfigService } from '@backstage/backend-plugin-api';
+import { readBitbucketServer } from '../bitbucket/bitbucketServer';
 import { createBitbucketDeploymentSchemaSource } from './bitbucketDeploymentSchema';
 
 const logger = { info: jest.fn() } as unknown as LoggerService;
@@ -31,31 +32,33 @@ describe('createBitbucketDeploymentSchemaSource', () => {
       getOptionalConfigArray: () => undefined,
     } as unknown as RootConfigService;
 
-    expect(createBitbucketDeploymentSchemaSource(config, logger)).toBeUndefined();
+    expect(readBitbucketServer(config)).toBeUndefined();
   });
 
   it('reads both schema files from the developerportal repository', async () => {
     fetchMock.mockImplementation(async (url: string) => ({
       ok: true,
       status: 200,
-      json: async () =>
-        String(url).endsWith(
-          'config/cd-deployment/schema/openshift-deployment.json',
-        )
-          ? { id: 'openshift-deployment', groups: [] }
-          : [{ id: 'cloud-aws', fields: [] }],
+      text: async () =>
+        JSON.stringify(
+          String(url).endsWith(
+            'config/cd-deployment/schema/openshift-deployment.json',
+          )
+            ? { id: 'openshift-deployment', groups: [] }
+            : [{ id: 'cloud-aws', fields: [] }],
+        ),
     }));
 
-    const source = createBitbucketDeploymentSchemaSource(
+    const server = readBitbucketServer(
       serverConfig({
         host: 'bitbucket.example.com',
         apiBaseUrl: 'https://bitbucket.example.com/rest/api/1.0/',
         token: 'secret-token',
       }),
-      logger,
     );
+    const source = createBitbucketDeploymentSchemaSource(server!, logger);
 
-    await expect(source?.load()).resolves.toEqual({
+    await expect(source.load()).resolves.toEqual({
       id: 'openshift-deployment',
       groups: [{ id: 'cloud-aws', fields: [] }],
     });

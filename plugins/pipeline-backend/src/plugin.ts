@@ -3,8 +3,9 @@ import {
   createBackendPlugin,
 } from '@backstage/backend-plugin-api';
 import { createCdDeploymentService } from './cd-deploymentService';
+import { createBitbucketCatalog } from './bitbucket/bitbucketCatalog';
+import { readBitbucketServer } from './bitbucket/bitbucketServer';
 import { createBitbucketDeploymentSchemaSource } from './schema/bitbucketDeploymentSchema';
-import { localDeploymentSchemaSource } from './schema/localDeploymentSchema';
 import { createOnboardingStore } from './onboardingStore';
 import { createRouter } from './router';
 
@@ -29,21 +30,17 @@ export const pipelinePlugin = createBackendPlugin({
             typeof createOnboardingStore
           >[0],
         );
+        const server = readBitbucketServer(config);
         const cdDeployment = createCdDeploymentService({ config, logger });
-        const bitbucketSchema = createBitbucketDeploymentSchemaSource(
-          config,
-          logger,
-        );
-        if (!bitbucketSchema) {
-          logger.info(
-            'integrations.bitbucketServer is not configured. Using the local deployment schema copies.',
-          );
-        }
         httpRouter.use(
           await createRouter({
             logger,
             store,
-            schemaSource: bitbucketSchema ?? localDeploymentSchemaSource,
+            config,
+            schemaSource: server
+              ? createBitbucketDeploymentSchemaSource(server, logger)
+              : undefined,
+            catalog: server ? createBitbucketCatalog(server) : undefined,
             cdDeployment,
           }),
         );

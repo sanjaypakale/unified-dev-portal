@@ -3,15 +3,54 @@ import express from 'express';
 import { createServer, get, request } from 'http';
 import { AddressInfo } from 'net';
 import { createRouter } from './router';
+import { BitbucketCatalog } from './bitbucket/bitbucketCatalog';
+import { DeploymentSchemaSource } from './schema/deploymentSchemaSource';
+import { CdDeploymentService } from './cd-deploymentService';
 
 const logger = {
   info: jest.fn(),
 } as unknown as LoggerService;
 
+const schemaSource: DeploymentSchemaSource = {
+  async load() {
+    return {
+      id: 'fixture',
+      groups: [
+        { id: 'urls', fields: [{ key: 'SIT_OC_URL' }] },
+        { id: 'cloud-aws', fields: [{ key: 'AWS_ACCOUNT_ID' }] },
+        { id: 'cloud-azure', fields: [{ key: 'AZURE_SUBSCRIPTION_ID' }] },
+      ],
+    };
+  },
+};
+
+const catalog: BitbucketCatalog = {
+  async listProjects() {
+    return [{ key: 'PAY', name: 'PAY' }];
+  },
+  async listRepositories() {
+    return [{ name: 'payments-service' }];
+  },
+};
+
+const cdDeployment: CdDeploymentService = {
+  async createPropertiesFile() {
+    return {
+      project: 'DVO',
+      repository: 'deployment-workflow',
+      path: 'PAY/cd_depoloyment_payments-service.properties',
+      content: '',
+      written: true,
+    };
+  },
+};
+
+const routerDeps = { logger, schemaSource, catalog, cdDeployment };
+
 describe('createRouter', () => {
   it('returns ok from the health route', async () => {
     const app = express();
-    app.use(await createRouter({ logger }));
+    app.use(await createRouter(routerDeps));
     const server = createServer(app);
     await new Promise<void>(resolve => {
       server.listen(0, '127.0.0.1', resolve);
@@ -37,7 +76,7 @@ describe('createRouter', () => {
 
   it('returns the stored deployment schema', async () => {
     const app = express();
-    app.use(await createRouter({ logger }));
+    app.use(await createRouter(routerDeps));
     const server = createServer(app);
     await new Promise<void>(resolve => {
       server.listen(0, '127.0.0.1', resolve);
@@ -76,7 +115,7 @@ describe('createRouter', () => {
 
   it('lists repositories for the selected Bitbucket project', async () => {
     const app = express();
-    app.use(await createRouter({ logger }));
+    app.use(await createRouter(routerDeps));
     const server = createServer(app);
     await new Promise<void>(resolve => {
       server.listen(0, '127.0.0.1', resolve);
@@ -113,7 +152,7 @@ describe('createRouter', () => {
 
   it('accepts an onboard submission and returns the stored schema', async () => {
     const app = express();
-    app.use(await createRouter({ logger }));
+    app.use(await createRouter(routerDeps));
     const server = createServer(app);
     await new Promise<void>(resolve => {
       server.listen(0, '127.0.0.1', resolve);

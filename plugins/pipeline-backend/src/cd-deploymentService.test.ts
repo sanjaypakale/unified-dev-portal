@@ -70,21 +70,11 @@ describe('renderDeploymentProperties', () => {
 });
 
 describe('createCdDeploymentService', () => {
-  it('renders the local template when Bitbucket is not configured', async () => {
+  it('fails when Bitbucket Server is not configured', async () => {
     const service = createCdDeploymentService({ config: emptyConfig, logger });
-    const result = await service.createPropertiesFile(request);
-
-    expect(result.written).toBe(false);
-    expect(result.project).toBe('DVO');
-    expect(result.repository).toBe('deployment-workflow');
-    expect(result.path).toBe('PAY/cd_depoloyment_payments-service.properties');
-    expect(result.content).toContain('COUNTRY_CODE=SG');
-    expect(result.content).toContain('CLUSTER_NAME=redhat');
-    expect(result.content).toContain('SIT_APP_OC_CREDENTIAL_ID=INT-T-PAY-ECP');
-    expect(result.content).toContain('CLUSTER_NETWORK=ECOM');
-    expect(result.content).toContain('IS_QUAY=false');
-    expect(result.content).toContain('COMMON_CONFIG_MAP_DIRECTORY_PATH=common');
-    expect(result.content).not.toContain('BITBUCKET_PROJECT_NAME');
+    await expect(service.createPropertiesFile(request)).rejects.toThrow(
+      'integrations.bitbucketServer is not configured',
+    );
   });
 
   it('writes the rendered file to the deployment-workflow repository', async () => {
