@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react';
 import { discoveryApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
 import { DeploymentSchema } from './schema';
 
-export const useDeploymentSchema = (options: {
-  enabled: boolean;
-  method?: string;
-  cloudProvider?: string;
-}) => {
+export const useDeploymentSchema = (options: { enabled: boolean }) => {
   const discoveryApi = useApi(discoveryApiRef);
   const fetchApi = useApi(fetchApiRef);
   const [schema, setSchema] = useState<DeploymentSchema>();
@@ -27,18 +23,9 @@ export const useDeploymentSchema = (options: {
     const load = async () => {
       try {
         const baseUrl = await discoveryApi.getBaseUrl('pipeline');
-        const params = new URLSearchParams();
-        if (options.method) {
-          params.set('method', options.method);
-        }
-        if (options.cloudProvider) {
-          params.set('cloudProvider', options.cloudProvider);
-        }
-        const query = params.toString();
-        const response = await fetchApi.fetch(
-          `${baseUrl}/schemas${query ? `?${query}` : ''}`,
-          { signal: controller.signal },
-        );
+        const response = await fetchApi.fetch(`${baseUrl}/schemas`, {
+          signal: controller.signal,
+        });
         if (!response.ok) {
           throw new Error(`Schema request failed (${response.status})`);
         }
@@ -71,9 +58,7 @@ export const useDeploymentSchema = (options: {
   }, [
     discoveryApi,
     fetchApi,
-    options.cloudProvider,
     options.enabled,
-    options.method,
   ]);
 
   return { schema, error, loading };

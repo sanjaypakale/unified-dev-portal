@@ -35,7 +35,7 @@ describe('createRouter', () => {
     expect(JSON.parse(body)).toEqual({ status: 'ok' });
   });
 
-  it('returns the deployment schema and the helm properties path', async () => {
+  it('returns the stored deployment schema', async () => {
     const app = express();
     app.use(await createRouter({ logger }));
     const server = createServer(app);
@@ -45,7 +45,7 @@ describe('createRouter', () => {
 
     const { port } = server.address() as AddressInfo;
     const body = await new Promise<string>((resolve, reject) => {
-      get(`http://127.0.0.1:${port}/schemas?method=helm`, response => {
+      get(`http://127.0.0.1:${port}/schemas`, response => {
         let data = '';
         response.on('data', chunk => {
           data += chunk;
@@ -66,10 +66,12 @@ describe('createRouter', () => {
     expect(fields.some((field: { key: string }) => field.key === 'SIT_OC_URL')).toBe(
       true,
     );
+    expect(fields.some((field: { key: string }) => field.key === 'AWS_ACCOUNT_ID')).toBe(
+      true,
+    );
     expect(
-      fields.find((field: { key: string }) => field.key === 'MODULE_PROPS_FILE_PATH')
-        ?.output?.constant,
-    ).toBe('Chart.yaml');
+      fields.some((field: { key: string }) => field.key === 'AZURE_SUBSCRIPTION_ID'),
+    ).toBe(true);
   });
 
   it('lists repositories for the selected Bitbucket project', async () => {
@@ -109,7 +111,7 @@ describe('createRouter', () => {
     );
   });
 
-  it('accepts an onboard submission and adds only the selected cloud fields', async () => {
+  it('accepts an onboard submission and returns the stored schema', async () => {
     const app = express();
     app.use(await createRouter({ logger }));
     const server = createServer(app);
@@ -158,7 +160,7 @@ describe('createRouter', () => {
         req.end();
       });
 
-    const schema = JSON.parse(await read('/schemas?cloudProvider=aws'));
+    const schema = JSON.parse(await read('/schemas'));
     const saved = await post('/onboard', {
       appCode: 'PAY',
       targetId: 'container-service',
@@ -182,7 +184,7 @@ describe('createRouter', () => {
         group.fields.map(field => field.key),
     );
     expect(keys).toContain('AWS_ACCOUNT_ID');
-    expect(keys).not.toContain('AZURE_SUBSCRIPTION_ID');
+    expect(keys).toContain('AZURE_SUBSCRIPTION_ID');
     expect(saved.status).toBe(201);
     expect(JSON.parse(saved.body).status).toBe('accepted');
     expect(pipelines).toEqual([

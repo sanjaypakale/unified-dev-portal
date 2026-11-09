@@ -15,10 +15,6 @@ import {
 } from './onboardingStore';
 import { localDeploymentSchemaSource } from './schema/localDeploymentSchema';
 import { DeploymentSchemaSource } from './schema/deploymentSchemaSource';
-import { readDeploymentSchema } from './schema/readDeploymentSchema';
-
-const queryValue = (value: unknown) =>
-  typeof value === 'string' && value.trim() ? value.trim() : undefined;
 
 const stringValues = (values: unknown) =>
   Object.fromEntries(
@@ -104,14 +100,8 @@ export async function createRouter({
     response.json(await records.list());
   });
 
-  router.get('/schemas', async (request, response) => {
-    const documents = await schemaSource.load();
-    response.json(
-      readDeploymentSchema(documents, {
-        method: queryValue(request.query.method),
-        cloudProvider: queryValue(request.query.cloudProvider),
-      }),
-    );
+  router.get('/schemas', async (_request, response) => {
+    response.json(await schemaSource.load());
   });
 
   return router;

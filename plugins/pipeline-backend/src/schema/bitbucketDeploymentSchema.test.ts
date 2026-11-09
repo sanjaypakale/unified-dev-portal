@@ -56,8 +56,8 @@ describe('createBitbucketDeploymentSchemaSource', () => {
     );
 
     await expect(source?.load()).resolves.toEqual({
-      openshift: { id: 'openshift-deployment', groups: [] },
-      cloudGroups: [{ id: 'cloud-aws', fields: [] }],
+      id: 'openshift-deployment',
+      groups: [{ id: 'cloud-aws', fields: [] }],
     });
     expect(fetchMock).toHaveBeenCalledWith(
       'https://bitbucket.example.com/rest/api/1.0/projects/gbtdpsddp/repos/developerportal/raw/config/cd-deployment/schema/openshift-deployment.json',

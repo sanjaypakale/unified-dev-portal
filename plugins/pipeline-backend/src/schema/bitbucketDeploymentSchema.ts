@@ -1,6 +1,5 @@
 import { LoggerService, RootConfigService } from '@backstage/backend-plugin-api';
-import { DeploymentSchemaSource } from './deploymentSchemaSource';
-import { DeploymentSchema, FieldGroup } from './types';
+import { combineSchemaFiles, DeploymentSchemaSource } from './deploymentSchemaSource';
 import {
   BITBUCKET_SCHEMA_PROJECT,
   BITBUCKET_SCHEMA_REPOSITORY,
@@ -54,10 +53,6 @@ const readJsonFile = async (
   return response.json();
 };
 
-/**
- * Reads openshift-deployment.json and cloud-provider.json from Bitbucket.
- * Returns undefined when integrations.bitbucketServer is not configured.
- */
 export const createBitbucketDeploymentSchemaSource = (
   config: RootConfigService,
   logger: LoggerService,
@@ -75,20 +70,7 @@ export const createBitbucketDeploymentSchemaSource = (
         readJsonFile(server, OPENSHIFT_SCHEMA_PATH),
         readJsonFile(server, CLOUD_PROVIDER_SCHEMA_PATH),
       ]);
-      if (
-        !openshift ||
-        typeof openshift !== 'object' ||
-        !Array.isArray((openshift as { groups?: unknown }).groups)
-      ) {
-        throw new Error(`${OPENSHIFT_SCHEMA_PATH} is not a deployment schema`);
-      }
-      if (!Array.isArray(cloudGroups)) {
-        throw new Error(`${CLOUD_PROVIDER_SCHEMA_PATH} is not a group list`);
-      }
-      return {
-        openshift: openshift as DeploymentSchema,
-        cloudGroups: cloudGroups as FieldGroup[],
-      };
+      return combineSchemaFiles(openshift, cloudGroups);
     },
   };
 };

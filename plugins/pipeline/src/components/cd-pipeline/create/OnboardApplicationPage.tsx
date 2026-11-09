@@ -34,7 +34,6 @@ import {
   findOption,
   OPENSHIFT_METHOD_OPTIONS,
   OTHERS_PLATFORM_ID,
-  OPENSHIFT_PLATFORM_ID,
   PLATFORM_OPTIONS,
 } from './wizardOptions';
 
@@ -60,15 +59,10 @@ export const OnboardApplicationPage = () => {
     target?.id === CONTAINER_SERVICE_ID &&
     Boolean(platform) &&
     Boolean(deploymentType?.deploymentTypeLabel);
-  const method = platformId === OPENSHIFT_PLATFORM_ID ? typeId : undefined;
   const cloudProvider = platformId === CLOUD_PLATFORM_ID ? typeId : undefined;
   const cloudLabel =
     platformId === CLOUD_PLATFORM_ID ? deploymentType?.title : undefined;
-  const { schema, error, loading } = useDeploymentSchema({
-    enabled: ready,
-    method,
-    cloudProvider,
-  });
+  const { schema, error, loading } = useDeploymentSchema({ enabled: ready });
   const [values, setValues] = useState<Record<string, string>>({});
   const [savedValues, setSavedValues] = useState<
     Record<string, string> | undefined
@@ -102,7 +96,7 @@ export const OnboardApplicationPage = () => {
         const saved = pipelines.find(item => String(item.id) === pipelineId);
         const valuesFromDatabase = { ...(saved?.values ?? {}) };
         valuesFromDatabase.APP_CODE =
-          saved?.appCode || valuesFromDatabase.APP_CODE || '';
+          saved?.appCode || valuesFromDatabase.APP_CODE || 'DDP';
         setSavedValues(valuesFromDatabase);
       })
       .catch(() => {
