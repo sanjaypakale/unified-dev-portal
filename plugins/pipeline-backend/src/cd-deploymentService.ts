@@ -34,11 +34,6 @@ export type CdDeploymentService = {
   createPropertiesFile(request: CdDeploymentRequest): Promise<CdDeploymentResult>;
 };
 
-type BitbucketServer = {
-  apiBaseUrl: string;
-  headers: Record<string, string>;
-};
-
 const environment = nunjucks.configure({ autoescape: false });
 
 const fileSegment = (value: string | undefined, label: string) => {
