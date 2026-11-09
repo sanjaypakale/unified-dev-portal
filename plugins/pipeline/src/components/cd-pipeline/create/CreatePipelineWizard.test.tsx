@@ -8,6 +8,7 @@ import {
 import { TestApiProvider, wrapInTestApp } from '@backstage/test-utils';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { authServiceApiRef } from '../../../api/AuthServiceApi';
 import { DdpApi, ddpApiRef, Pipeline } from '../../../api/DdpApi';
 import { CreatePipelineWizard } from './CreatePipelineWizard';
 import { OnboardApplicationPage } from './OnboardApplicationPage';
@@ -37,6 +38,7 @@ const renderWizard = (
         apis={[
           [configApiRef, configApi],
           [alertApiRef, { post: jest.fn() }],
+          [authServiceApiRef, { getAppCode: () => 'PAY' }],
           [ddpApiRef, ddpApi],
           [discoveryApiRef, { getBaseUrl: async () => 'http://pipeline.test' }],
           [

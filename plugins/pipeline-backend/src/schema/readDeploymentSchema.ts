@@ -1,10 +1,7 @@
-import cloudProviderGroups from './cloud-providers.json';
-import openshiftDeploymentSchema from './openshift-deployment.json';
+import { DeploymentSchemaDocuments } from './deploymentSchemaSource';
 import { DeploymentSchema, FieldGroup } from './types';
 
-const cloudGroups = cloudProviderGroups as FieldGroup[];
-
-const groupsForProvider = (cloudProvider?: string) => {
+const groupsForProvider = (cloudGroups: FieldGroup[], cloudProvider?: string) => {
   if (!cloudProvider) {
     return [];
   }
@@ -22,17 +19,22 @@ const groupsForProvider = (cloudProvider?: string) => {
 const modulePropsFilePathFor = (method?: string) =>
   method === 'helm' ? 'Chart.yaml' : 'Version.properties';
 
-/** Loads the shared deployment schema and appends a cloud provider schema when one exists. */
-export const readDeploymentSchema = (options?: {
-  method?: string;
-  cloudProvider?: string;
-}): DeploymentSchema => {
-  const base = openshiftDeploymentSchema as DeploymentSchema;
-  const groups = [...base.groups, ...groupsForProvider(options?.cloudProvider)];
+/** Builds the form schema and appends a cloud provider schema when one exists. */
+export const readDeploymentSchema = (
+  documents: DeploymentSchemaDocuments,
+  options?: {
+    method?: string;
+    cloudProvider?: string;
+  },
+): DeploymentSchema => {
+  const groups = [
+    ...documents.openshift.groups,
+    ...groupsForProvider(documents.cloudGroups, options?.cloudProvider),
+  ];
   const modulePropsFilePath = modulePropsFilePathFor(options?.method);
 
   return {
-    id: base.id,
+    id: documents.openshift.id,
     groups: groups.map(group => ({
       ...group,
       fields: group.fields.map(field =>

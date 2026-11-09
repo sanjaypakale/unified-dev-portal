@@ -5,6 +5,8 @@ export {
   CreatePipelineWizard,
   OnboardApplicationPage,
 } from './components/cd-pipeline/create';
+export { authServiceApiRef } from './api/AuthServiceApi';
+export type { AuthServiceApi } from './api/AuthServiceApi';
 export { PipelineApiClient } from './api/PipelineApiClient';
 export { ddpApiRef } from './api/DdpApi';
 export type {

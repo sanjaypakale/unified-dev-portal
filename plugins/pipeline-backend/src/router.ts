@@ -9,6 +9,8 @@ import {
   createMemoryOnboardingStore,
   OnboardingStore,
 } from './onboardingStore';
+import { localDeploymentSchemaSource } from './schema/localDeploymentSchema';
+import { DeploymentSchemaSource } from './schema/deploymentSchemaSource';
 import { readDeploymentSchema } from './schema/readDeploymentSchema';
 
 const queryValue = (value: unknown) =>
@@ -18,9 +20,11 @@ const queryValue = (value: unknown) =>
 export async function createRouter({
   logger,
   store,
+  schemaSource = localDeploymentSchemaSource,
 }: {
   logger: LoggerService;
   store?: OnboardingStore;
+  schemaSource?: DeploymentSchemaSource;
 }): Promise<express.Router> {
   const records = store ?? createMemoryOnboardingStore();
   const router = Router();
@@ -59,9 +63,10 @@ export async function createRouter({
     response.json(await records.list());
   });
 
-  router.get('/schemas', (request, response) => {
+  router.get('/schemas', async (request, response) => {
+    const documents = await schemaSource.load();
     response.json(
-      readDeploymentSchema({
+      readDeploymentSchema(documents, {
         method: queryValue(request.query.method),
         cloudProvider: queryValue(request.query.cloudProvider),
       }),

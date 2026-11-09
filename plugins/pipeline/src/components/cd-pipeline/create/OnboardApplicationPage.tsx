@@ -10,6 +10,7 @@ import {
   Progress,
 } from '@backstage/core-components';
 import { alertApiRef, useApi } from '@backstage/core-plugin-api';
+import { authServiceApiRef } from '../../../api/AuthServiceApi';
 import { ddpApiRef } from '../../../api/DdpApi';
 import { PIPELINES_PATH } from '../types';
 import { useCloudProviderOptions } from './cloudProviders';
@@ -43,6 +44,7 @@ export const OnboardApplicationPage = () => {
   const location = useLocation();
   const { pipelineId } = useParams();
   const ddpApi = useApi(ddpApiRef);
+  const authService = useApi(authServiceApiRef);
   const alertApi = useApi(alertApiRef);
   const cloudOptions = useCloudProviderOptions();
   const { targetId, platformId, typeId, step } = readOnboardSearch(location.search);
@@ -98,7 +100,10 @@ export const OnboardApplicationPage = () => {
           return;
         }
         const saved = pipelines.find(item => String(item.id) === pipelineId);
-        setSavedValues(saved?.values ?? {});
+        const valuesFromDatabase = { ...(saved?.values ?? {}) };
+        valuesFromDatabase.APP_CODE =
+          saved?.appCode || valuesFromDatabase.APP_CODE || '';
+        setSavedValues(valuesFromDatabase);
       })
       .catch(() => {
         if (active) {
@@ -119,6 +124,9 @@ export const OnboardApplicationPage = () => {
         return current;
       }
       const next = { ...savedValues };
+      if (!pipelineId) {
+        next.APP_CODE = authService.getAppCode();
+      }
       schema.groups.forEach(group => {
         group.fields.forEach(field => {
           if (next[field.key] === undefined && field.defaultValue) {
@@ -128,7 +136,7 @@ export const OnboardApplicationPage = () => {
       });
       return next;
     });
-  }, [schema, savedValues]);
+  }, [authService, pipelineId, schema, savedValues]);
 
   const leaveWizard = () =>
     navigate(pipelineId ? reonboardPath(pipelineId) : CREATE_PIPELINE_PATH, {
@@ -169,12 +177,14 @@ export const OnboardApplicationPage = () => {
     setSubmitting(true);
     setSubmitError(undefined);
     try {
+      const appCode = pipelineId ? values.APP_CODE || '' : authService.getAppCode();
       const saved = await ddpApi.savePipeline({
         pipelineId,
+        appCode,
         targetId,
         platformId,
         typeId,
-        values,
+        values: { ...values, APP_CODE: appCode },
       });
       setSubmittedId(saved.id);
       const moduleName = values.MODULE_NAME || 'the application';

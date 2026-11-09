@@ -44,6 +44,14 @@ integrations:
       # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
       # The actual value should be provided via the GITHUB_TOKEN environment variable and MUST NOT be committed to source control.
       token: ${GITHUB_TOKEN}
+  # Deployment schemas are read from Bitbucket project gbtdpsddp, repository
+  # developerportal, folder config/cd-deployment/schema (openshift-deployment.json
+  # and cloud-provider.json). Uncomment and set the host when that server is available.
+  # Until then the copies in pipeline-backend are used.
+  # bitbucketServer:
+  #   - host: bitbucket.example.com
+  #     apiBaseUrl: https://bitbucket.example.com/rest/api/1.0
+  #     token: ${BITBUCKET_TOKEN}
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3

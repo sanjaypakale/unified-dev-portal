@@ -12,8 +12,10 @@ import {
 } from '@backstage/core-plugin-api';
 import {
   PipelineApiClient,
+  authServiceApiRef,
   ddpApiRef as pipelineDdpApiRef,
 } from '@internal/plugin-pipeline';
+import { AuthService } from './api/AuthService';
 import { DdpApiClient, ddpApiRef } from './api/DdpApi';
 
 export const apis: AnyApiFactory[] = [
@@ -31,6 +33,11 @@ export const apis: AnyApiFactory[] = [
     },
     factory: ({ discoveryApi, fetchApi }) =>
       new DdpApiClient(discoveryApi, fetchApi),
+  }),
+  createApiFactory({
+    api: authServiceApiRef,
+    deps: {},
+    factory: () => new AuthService(),
   }),
   createApiFactory({
     api: pipelineDdpApiRef,

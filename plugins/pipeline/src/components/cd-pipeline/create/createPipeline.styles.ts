@@ -127,6 +127,7 @@ export const useCreatePipelineStyles = makeStyles(theme => ({
   actions: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: theme.spacing(1),
     marginTop: theme.spacing(3),
   },

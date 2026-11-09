@@ -24,7 +24,7 @@ const deploymentTypeFor = (record: SavedPipeline) => {
 
 const toPipeline = (record: SavedPipeline): Pipeline => ({
   id: record.id,
-  appCode: record.values?.APP_CODE || '',
+  appCode: record.appCode || record.values?.APP_CODE || '',
   bitbucketProjectName: record.values?.BITBUCKET_PROJECT_NAME || '',
   moduleName: record.values?.MODULE_NAME || '',
   deploymentType: deploymentTypeFor(record),

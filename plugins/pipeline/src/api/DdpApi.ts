@@ -16,6 +16,7 @@ export type Pipeline = {
 
 export type SavePipelineRequest = {
   pipelineId?: string;
+  appCode?: string;
   targetId?: string;
   platformId?: string;
   typeId?: string;
