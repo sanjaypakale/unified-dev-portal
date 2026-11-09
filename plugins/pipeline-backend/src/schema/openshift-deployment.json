@@ -6,7 +6,6 @@
       "title": "Derived values",
       "fields": [
         { "key": "APP_CODE", "widget": "hidden", "output": { "fromContext": "appCode" } },
-        { "key": "COUNTRY_CODE", "widget": "hidden", "output": { "fromContext": "countryCode" } },
         { "key": "SIT_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "sitArtRepoName" } },
         { "key": "UAT_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "uatArtRepoName" } },
         { "key": "PRD_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "prdArtRepoName" } },
@@ -45,6 +44,21 @@
           "optionsSource": "bitbucket-repositories",
           "dependsOn": "BITBUCKET_PROJECT_NAME",
           "errorMessage": "Bitbucket repository name is required"
+        },
+        {
+          "key": "COUNTRY_CODE",
+          "label": "Country code",
+          "widget": "select",
+          "required": true,
+          "options": [
+            { "label": "SG", "value": "SG" },
+            { "label": "MY", "value": "MY" },
+            { "label": "ID", "value": "ID" },
+            { "label": "TH", "value": "TH" },
+            { "label": "CN", "value": "CN" },
+            { "label": "IN", "value": "IN" }
+          ],
+          "errorMessage": "Country code is required"
         },
         {
           "key": "NOTIFICATION_EMAIL",

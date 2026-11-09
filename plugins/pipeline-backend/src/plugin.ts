@@ -2,6 +2,7 @@ import {
   coreServices,
   createBackendPlugin,
 } from '@backstage/backend-plugin-api';
+import { createCdDeploymentService } from './cd-deploymentService';
 import { createBitbucketDeploymentSchemaSource } from './schema/bitbucketDeploymentSchema';
 import { localDeploymentSchemaSource } from './schema/localDeploymentSchema';
 import { createOnboardingStore } from './onboardingStore';
@@ -28,6 +29,7 @@ export const pipelinePlugin = createBackendPlugin({
             typeof createOnboardingStore
           >[0],
         );
+        const cdDeployment = createCdDeploymentService({ config, logger });
         const bitbucketSchema = createBitbucketDeploymentSchemaSource(
           config,
           logger,
@@ -42,6 +44,7 @@ export const pipelinePlugin = createBackendPlugin({
             logger,
             store,
             schemaSource: bitbucketSchema ?? localDeploymentSchemaSource,
+            cdDeployment,
           }),
         );
         httpRouter.addAuthPolicy({

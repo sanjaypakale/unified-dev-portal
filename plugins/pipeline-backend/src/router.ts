@@ -1,6 +1,10 @@
-import { LoggerService } from '@backstage/backend-plugin-api';
+import { LoggerService, RootConfigService } from '@backstage/backend-plugin-api';
 import express from 'express';
 import Router from 'express-promise-router';
+import {
+  CdDeploymentService,
+  createCdDeploymentService,
+} from './cd-deploymentService';
 import {
   listBitbucketProjects,
   listBitbucketRepositories,
@@ -16,17 +20,41 @@ import { readDeploymentSchema } from './schema/readDeploymentSchema';
 const queryValue = (value: unknown) =>
   typeof value === 'string' && value.trim() ? value.trim() : undefined;
 
+const stringValues = (values: unknown) =>
+  Object.fromEntries(
+    Object.entries(values as Record<string, unknown>).filter(
+      (entry): entry is [string, string] => typeof entry[1] === 'string',
+    ),
+  );
+
+const textValue = (value: unknown) =>
+  typeof value === 'string' ? value : undefined;
+
 /** Creates the pipeline backend HTTP router. */
 export async function createRouter({
   logger,
   store,
   schemaSource = localDeploymentSchemaSource,
+  config,
+  cdDeployment,
 }: {
   logger: LoggerService;
   store?: OnboardingStore;
   schemaSource?: DeploymentSchemaSource;
+  config?: RootConfigService;
+  cdDeployment?: CdDeploymentService;
 }): Promise<express.Router> {
   const records = store ?? createMemoryOnboardingStore();
+  const deployment =
+    cdDeployment ??
+    createCdDeploymentService({
+      config:
+        config ??
+        ({
+          getOptionalConfigArray: () => undefined,
+        } as unknown as RootConfigService),
+      logger,
+    });
   const router = Router();
   router.use(express.json());
 
@@ -49,14 +77,27 @@ export async function createRouter({
       response.status(400).json({ message: 'Onboarding payload is required' });
       return;
     }
-    const values = (body as { values?: unknown }).values;
+    const payload = body as Record<string, unknown>;
+    const values = payload.values;
     if (!values || typeof values !== 'object' || Array.isArray(values)) {
       response.status(400).json({ message: 'values are required' });
       return;
     }
-    const saved = await records.save(body as Record<string, unknown>);
+    const properties = await deployment.createPropertiesFile({
+      appCode: textValue(payload.appCode),
+      targetId: textValue(payload.targetId),
+      platformId: textValue(payload.platformId),
+      typeId: textValue(payload.typeId),
+      values: stringValues(values),
+    });
+    const saved = await records.save(payload);
     logger.info(`Accepted onboarding ${saved.id}`);
-    response.status(201).json({ id: saved.id, status: 'accepted' });
+    response.status(201).json({
+      id: saved.id,
+      status: 'accepted',
+      propertiesPath: properties.path,
+      propertiesWritten: properties.written,
+    });
   });
 
   router.get('/pipelines', async (_request, response) => {

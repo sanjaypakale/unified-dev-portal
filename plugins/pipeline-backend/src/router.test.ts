@@ -160,10 +160,12 @@ describe('createRouter', () => {
 
     const schema = JSON.parse(await read('/schemas?cloudProvider=aws'));
     const saved = await post('/onboard', {
+      appCode: 'PAY',
       targetId: 'container-service',
       platformId: 'openshift',
       typeId: 'kustomize',
       values: {
+        APP_CODE: 'PAY',
         BITBUCKET_PROJECT_NAME: 'PAY',
         MODULE_NAME: 'payments-service',
         NOTIFICATION_EMAIL: 'person@uobgroup.com',

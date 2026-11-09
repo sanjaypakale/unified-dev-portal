@@ -5748,8 +5748,10 @@ __metadata:
     "@backstage/backend-plugin-api": "npm:^1.6.2"
     "@backstage/cli": "npm:^0.35.2"
     "@types/express": "npm:^4.17.6"
+    "@types/nunjucks": "npm:^3.2.6"
     express: "npm:^4.22.0"
     express-promise-router: "npm:^4.1.0"
+    nunjucks: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
 
@@ -13606,6 +13608,13 @@ __metadata:
   dependencies:
     undici-types: "npm:~7.16.0"
   checksum: 10c0/2578baa9443d62b0f13444b7965790912eca6d25c205e594cfa96689fa9bc6a676d2d4d7024a95a92e42e4be52133e5608ece2ef86edb12ee110c8b52f603a35
+  languageName: node
+  linkType: hard
+
+"@types/nunjucks@npm:^3.2.6":
+  version: 3.2.6
+  resolution: "@types/nunjucks@npm:3.2.6"
+  checksum: 10c0/bc62c5c9305c0c63a49a55c3553393fdc84d123b4831668212380077ee6646c3ba52bc49e3c651257addf3a47d775707dcefeaf5e1b76cf7f680096939894142
   languageName: node
   linkType: hard
 
@@ -25844,7 +25853,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nunjucks@npm:^3.2.3":
+"nunjucks@npm:^3.2.3, nunjucks@npm:^3.2.4":
   version: 3.2.4
   resolution: "nunjucks@npm:3.2.4"
   dependencies:
