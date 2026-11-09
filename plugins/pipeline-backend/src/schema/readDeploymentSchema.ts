@@ -1,7 +1,23 @@
+import cloudProviderGroups from './cloud-providers.json';
 import openshiftDeploymentSchema from './openshift-deployment.json';
-import { DeploymentSchema } from './types';
+import { DeploymentSchema, FieldGroup } from './types';
 
-const cloudSchemas: Record<string, DeploymentSchema> = {};
+const cloudGroups = cloudProviderGroups as FieldGroup[];
+
+const groupsForProvider = (cloudProvider?: string) => {
+  if (!cloudProvider) {
+    return [];
+  }
+  return cloudGroups.filter(group => {
+    const when = group.when;
+    return (
+      when !== undefined &&
+      'context' in when &&
+      when.context === 'cloudProvider' &&
+      when.equals === cloudProvider
+    );
+  });
+};
 
 const modulePropsFilePathFor = (method?: string) =>
   method === 'helm' ? 'Chart.yaml' : 'Version.properties';
@@ -12,10 +28,7 @@ export const readDeploymentSchema = (options?: {
   cloudProvider?: string;
 }): DeploymentSchema => {
   const base = openshiftDeploymentSchema as DeploymentSchema;
-  const extra = options?.cloudProvider
-    ? cloudSchemas[options.cloudProvider]
-    : undefined;
-  const groups = extra ? [...base.groups, ...extra.groups] : base.groups;
+  const groups = [...base.groups, ...groupsForProvider(options?.cloudProvider)];
   const modulePropsFilePath = modulePropsFilePathFor(options?.method);
 
   return {

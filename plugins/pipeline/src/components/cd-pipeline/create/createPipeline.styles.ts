@@ -127,6 +127,17 @@ export const useCreatePipelineStyles = makeStyles(theme => ({
   actions: {
     display: 'flex',
     alignItems: 'center',
+    gap: theme.spacing(1),
+    marginTop: theme.spacing(3),
+  },
+  stepper: {
+    marginBottom: theme.spacing(3),
+    padding: 0,
+    backgroundColor: 'transparent',
+  },
+  reviewDetails: {
+    display: 'block',
+    width: '100%',
   },
   helper: {
     marginTop: theme.spacing(1),

@@ -17,6 +17,9 @@ type FieldControlProps = {
   field: DeploymentField;
   value?: string;
   required: boolean;
+  disabled?: boolean;
+  helperText?: string;
+  forceError?: boolean;
   onChange: (value: string) => void;
 };
 
@@ -24,11 +27,22 @@ export const FieldControl = ({
   field,
   value,
   required,
+  disabled = false,
+  helperText,
+  forceError = false,
   onChange,
 }: FieldControlProps) => {
   const [touched, setTouched] = useState(false);
   const current = value ?? field.defaultValue ?? '';
-  const showError = touched && required && !current;
+  const patternError =
+    current.trim() && field.pattern && !new RegExp(field.pattern, 'i').test(current.trim())
+      ? field.patternMessage || 'Invalid value'
+      : undefined;
+  const requiredError = required && !current.trim();
+  const showError = (touched || forceError) && (requiredError || Boolean(patternError));
+  const errorText = requiredError
+    ? field.errorMessage || `${field.label || field.key} is required`
+    : patternError;
 
   if (field.widget === 'hidden') {
     return null;
@@ -54,7 +68,7 @@ export const FieldControl = ({
             />
           ))}
         </RadioGroup>
-        {showError && <FormHelperText>{field.errorMessage}</FormHelperText>}
+        {showError && <FormHelperText>{errorText}</FormHelperText>}
       </FormControl>
     );
   }
@@ -65,6 +79,7 @@ export const FieldControl = ({
         fullWidth
         required={required}
         error={showError}
+        disabled={disabled}
         variant="outlined"
         size="small"
       >
@@ -74,6 +89,7 @@ export const FieldControl = ({
           id={field.key}
           label={required ? `${field.label}\u00a0*` : field.label}
           value={current}
+          disabled={disabled}
           onChange={event => onChange(String(event.target.value))}
           onBlur={() => setTouched(true)}
         >
@@ -83,7 +99,9 @@ export const FieldControl = ({
             </MenuItem>
           ))}
         </Select>
-        {showError && <FormHelperText>{field.errorMessage}</FormHelperText>}
+        {(showError || helperText) && (
+          <FormHelperText>{showError ? errorText : helperText}</FormHelperText>
+        )}
       </FormControl>
     );
   }
@@ -98,7 +116,7 @@ export const FieldControl = ({
       variant="outlined"
       size='small'
       error={showError}
-      helperText={showError ? field.errorMessage : undefined}
+      helperText={showError ? errorText : helperText || field.helperText}
       onChange={event => onChange(event.target.value)}
       onBlur={() => setTouched(true)}
     />

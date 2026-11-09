@@ -5,6 +5,12 @@ export {
   CreatePipelineWizard,
   OnboardApplicationPage,
 } from './components/cd-pipeline/create';
+export { PipelineApiClient } from './api/PipelineApiClient';
 export { ddpApiRef } from './api/DdpApi';
-export type { DdpApi, Pipeline, PipelineDeploymentType } from './api/DdpApi';
+export type {
+  DdpApi,
+  Pipeline,
+  PipelineDeploymentType,
+  SavePipelineRequest,
+} from './api/DdpApi';
 export { rootRouteRef } from './routes';

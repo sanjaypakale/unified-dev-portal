@@ -1,0 +1,47 @@
+[
+  {
+    "id": "cloud-aws",
+    "title": "AWS",
+    "step": "cloud",
+    "when": { "context": "cloudProvider", "equals": "aws" },
+    "fields": [
+      {
+        "key": "AWS_ACCOUNT_ID",
+        "label": "AWS account id",
+        "widget": "text",
+        "required": true,
+        "errorMessage": "AWS account id is required"
+      }
+    ]
+  },
+  {
+    "id": "cloud-azure",
+    "title": "AZURE",
+    "step": "cloud",
+    "when": { "context": "cloudProvider", "equals": "azure" },
+    "fields": [
+      {
+        "key": "AZURE_SUBSCRIPTION_ID",
+        "label": "Azure subscription id",
+        "widget": "text",
+        "required": true,
+        "errorMessage": "Azure subscription id is required"
+      }
+    ]
+  },
+  {
+    "id": "cloud-gcp",
+    "title": "GCP",
+    "step": "cloud",
+    "when": { "context": "cloudProvider", "equals": "gcp" },
+    "fields": [
+      {
+        "key": "GCP_PROJECT_ID",
+        "label": "GCP project id",
+        "widget": "text",
+        "required": true,
+        "errorMessage": "GCP project id is required"
+      }
+    ]
+  }
+]

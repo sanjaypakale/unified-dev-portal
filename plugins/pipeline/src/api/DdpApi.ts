@@ -11,11 +11,21 @@ export type Pipeline = {
   targetId?: string;
   platformId?: string;
   typeId?: string;
+  values?: Record<string, string>;
+};
+
+export type SavePipelineRequest = {
+  pipelineId?: string;
+  targetId?: string;
+  platformId?: string;
+  typeId?: string;
+  values: Record<string, string>;
 };
 
 /** Pipeline data used by the continuous delivery pages. */
 export interface DdpApi {
   getAllPipelines(): Promise<Pipeline[]>;
+  savePipeline(request: SavePipelineRequest): Promise<{ id: number }>;
 }
 
 export const ddpApiRef = createApiRef<DdpApi>({

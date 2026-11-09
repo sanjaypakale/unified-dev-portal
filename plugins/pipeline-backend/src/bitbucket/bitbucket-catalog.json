@@ -1,0 +1,17 @@
+[
+  {
+    "key": "PAY",
+    "name": "PAY",
+    "repositories": ["payments-service", "payments-batch"]
+  },
+  {
+    "key": "IDP",
+    "name": "IDP",
+    "repositories": ["identity-portal"]
+  },
+  {
+    "key": "CAT",
+    "name": "CAT",
+    "repositories": ["catalog-gateway", "catalog-indexer"]
+  }
+]

@@ -18,7 +18,12 @@ export type DeploymentField = {
   defaultValue?: string;
   options?: FieldOption[];
   errorMessage?: string;
+  pattern?: string;
+  patternMessage?: string;
+  helperText?: string;
   write?: boolean;
+  optionsSource?: 'bitbucket-projects' | 'bitbucket-repositories';
+  dependsOn?: string;
   output?: {
     map?: Record<string, string>;
     template?: string;
@@ -31,6 +36,7 @@ export type DeploymentField = {
 export type FieldGroup = {
   id: string;
   title: string;
+  step?: 'repository' | 'deployment' | 'cloud';
   when?: Condition;
   fields: DeploymentField[];
 };

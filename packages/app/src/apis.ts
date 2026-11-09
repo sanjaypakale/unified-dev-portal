@@ -10,7 +10,10 @@ import {
   discoveryApiRef,
   fetchApiRef,
 } from '@backstage/core-plugin-api';
-import { ddpApiRef as pipelineDdpApiRef } from '@internal/plugin-pipeline';
+import {
+  PipelineApiClient,
+  ddpApiRef as pipelineDdpApiRef,
+} from '@internal/plugin-pipeline';
 import { DdpApiClient, ddpApiRef } from './api/DdpApi';
 
 export const apis: AnyApiFactory[] = [
@@ -31,7 +34,11 @@ export const apis: AnyApiFactory[] = [
   }),
   createApiFactory({
     api: pipelineDdpApiRef,
-    deps: { ddpApi: ddpApiRef },
-    factory: ({ ddpApi }) => ddpApi,
+    deps: {
+      discoveryApi: discoveryApiRef,
+      fetchApi: fetchApiRef,
+    },
+    factory: ({ discoveryApi, fetchApi }) =>
+      new PipelineApiClient({ discoveryApi, fetchApi }),
   }),
 ];

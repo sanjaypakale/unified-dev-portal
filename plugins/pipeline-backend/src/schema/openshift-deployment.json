@@ -6,7 +6,6 @@
       "title": "Derived values",
       "fields": [
         { "key": "APP_CODE", "widget": "hidden", "output": { "fromContext": "appCode" } },
-        { "key": "MODULE_NAME", "widget": "hidden", "output": { "fromContext": "moduleName" } },
         { "key": "COUNTRY_CODE", "widget": "hidden", "output": { "fromContext": "countryCode" } },
         { "key": "SIT_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "sitArtRepoName" } },
         { "key": "UAT_ART_REPO_NAME", "widget": "hidden", "output": { "fromContext": "uatArtRepoName" } },
@@ -25,8 +24,44 @@
       ]
     },
     {
+      "id": "bitbucket",
+      "title": "Bitbucket",
+      "step": "repository",
+      "fields": [
+        {
+          "key": "BITBUCKET_PROJECT_NAME",
+          "label": "Bitbucket Project Name",
+          "widget": "select",
+          "required": true,
+          "optionsSource": "bitbucket-projects",
+          "errorMessage": "Bitbucket project name is required",
+          "write": false
+        },
+        {
+          "key": "MODULE_NAME",
+          "label": "Bitbucket Repository Name",
+          "widget": "select",
+          "required": true,
+          "optionsSource": "bitbucket-repositories",
+          "dependsOn": "BITBUCKET_PROJECT_NAME",
+          "errorMessage": "Bitbucket repository name is required"
+        },
+        {
+          "key": "NOTIFICATION_EMAIL",
+          "label": "Notification email",
+          "widget": "text",
+          "required": true,
+          "pattern": "^[^\\s@]+@uobgroup\\.com$",
+          "errorMessage": "Notification email is required",
+          "patternMessage": "Email must end with uobgroup.com",
+          "helperText": "Must end with @uobgroup.com"
+        }
+      ]
+    },
+    {
       "id": "image",
       "title": "Image",
+      "step": "deployment",
       "fields": [
         {
           "key": "IS_VENDOR",
@@ -65,6 +100,7 @@
     {
       "id": "openshift-urls",
       "title": "OpenShift URLs",
+      "step": "deployment",
       "fields": [
         {
           "key": "SIT_OC_URL",
@@ -97,6 +133,7 @@
     {
       "id": "jenkins-clouds",
       "title": "Jenkins clouds",
+      "step": "deployment",
       "fields": [
         {
           "key": "SIT_CLOUD",
@@ -129,6 +166,7 @@
     {
       "id": "cluster",
       "title": "Cluster",
+      "step": "deployment",
       "fields": [
         {
           "key": "CLUSTER_NETWORK",
@@ -157,6 +195,7 @@
     {
       "id": "docker-repos",
       "title": "Docker repositories",
+      "step": "deployment",
       "fields": [
         { "key": "SIT_DOCKER_REPO_NAME", "label": "SIT Docker repository name", "widget": "text" },
         { "key": "UAT_DOCKER_REPO_NAME", "label": "UAT Docker repository name", "widget": "text" },
@@ -166,6 +205,7 @@
     {
       "id": "agents",
       "title": "Static agent",
+      "step": "deployment",
       "fields": [
         {
           "key": "IS_STATIC_AGENT",
@@ -227,6 +267,7 @@
     {
       "id": "commands",
       "title": "Commands",
+      "step": "deployment",
       "fields": [
         { "key": "DEPLOY_COMMAND", "label": "Enter Deployment Command", "widget": "text" },
         { "key": "ROLLOUT_COMMAND", "label": "Enter Rollout Command", "widget": "text" },

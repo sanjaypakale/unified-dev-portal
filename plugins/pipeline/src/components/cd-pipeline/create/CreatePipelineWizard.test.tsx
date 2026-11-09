@@ -1,5 +1,10 @@
 import { ConfigReader } from '@backstage/config';
-import { configApiRef } from '@backstage/core-plugin-api';
+import {
+  alertApiRef,
+  configApiRef,
+  discoveryApiRef,
+  fetchApiRef,
+} from '@backstage/core-plugin-api';
 import { TestApiProvider, wrapInTestApp } from '@backstage/test-utils';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Route, Routes, useLocation } from 'react-router-dom';
@@ -31,7 +36,18 @@ const renderWizard = (
       <TestApiProvider
         apis={[
           [configApiRef, configApi],
+          [alertApiRef, { post: jest.fn() }],
           [ddpApiRef, ddpApi],
+          [discoveryApiRef, { getBaseUrl: async () => 'http://pipeline.test' }],
+          [
+            fetchApiRef,
+            {
+              fetch: async () => ({
+                ok: true,
+                json: async () => ({ id: 'openshift-deployment', groups: [] }),
+              }),
+            },
+          ],
         ]}
       >
         <Pathname />
